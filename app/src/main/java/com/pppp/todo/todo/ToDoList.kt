@@ -36,11 +36,11 @@ fun ToDoListPreview() {
 @Preview
 @Composable
 fun ToDoListItem() {
-    ToDoListItem(ToDo(0, "Foobar"), { id, selected -> })
+    ToDoListItem(ToDo(0.toString(), "Foobar"), { id, selected -> })
 }
 
 @Composable
-fun ToDoListItem(toDo: ToDo, onItemChecked: ((Long, Boolean) -> Unit)) {
+fun ToDoListItem(toDo: ToDo, onItemChecked: ((String, Boolean) -> Unit)) {
     Surface(
         modifier = Modifier.padding(
             PaddingValues(
@@ -74,7 +74,7 @@ fun ToDoListItem(toDo: ToDo, onItemChecked: ((Long, Boolean) -> Unit)) {
 }
 
 @Composable
-private fun ToDoIcon(modifier: Modifier, toDo: ToDo, onItemChecked: (Long) -> Unit) {
+private fun ToDoIcon(modifier: Modifier, toDo: ToDo, onItemChecked: (String) -> Unit) {
     var image by remember {
         mutableStateOf(toDo.getStarImage())
     }
@@ -105,7 +105,7 @@ private fun ToDo.getStarImage() =
 @Composable
 private fun ToDoCheckBox(
     toDo: ToDo,
-    onItemChecked: (Long, Boolean) -> Unit
+    onItemChecked: (String, Boolean) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {

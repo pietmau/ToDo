@@ -1,8 +1,8 @@
 package com.pppp.usecases
 
-import com.sun.tools.javac.comp.Todo
+import  com.pppp.entities.ToDo
 
 interface Repository {
 
-    suspend fun getToDos(): List<Todo>
+    suspend fun getToDos(): List<ToDo>
 }
