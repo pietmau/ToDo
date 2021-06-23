@@ -1,46 +1,22 @@
-package com.pppp.todo.todo
+package com.pppp.todo.main.todo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons.Outlined
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pppp.entities.ToDo
-import com.pppp.todo.model.FakeData
+import com.pppp.todo.main.ToDoViewModel
 
 @Composable
-fun ToDoList(toDos: List<ToDo>) {
-    LazyColumn {
-        items(toDos) {
-            ToDoListItem(toDo = it, { id, selected -> })
-        }
-    }
-}
-
-@Preview
-@Composable
-fun ToDoListPreview() {
-    ToDoList(FakeData.toDos())
-}
-
-@Preview
-@Composable
-fun ToDoListItem() {
-    ToDoListItem(ToDo(0.toString(), "Foobar"), { id, selected -> })
-}
-
-@Composable
-fun ToDoListItem(toDo: ToDo, onItemChecked: ((String, Boolean) -> Unit)) {
+fun ToDoItem(toDo: ToDoViewModel, onItemChecked: ((String, Boolean) -> Unit)) {
     Surface(
         modifier = Modifier.padding(
             PaddingValues(
@@ -56,7 +32,7 @@ fun ToDoListItem(toDo: ToDo, onItemChecked: ((String, Boolean) -> Unit)) {
         )
     ) {
         Row(
-            verticalAlignment = CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -68,13 +44,13 @@ fun ToDoListItem(toDo: ToDo, onItemChecked: ((String, Boolean) -> Unit)) {
                 modifier = Modifier.weight(1F, true)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ToDoIcon(Modifier, toDo, {})
+            ToDoIcon(Modifier, toDo) {}
         }
     }
 }
 
 @Composable
-private fun ToDoIcon(modifier: Modifier, toDo: ToDo, onItemChecked: (String) -> Unit) {
+private fun ToDoIcon(modifier: Modifier, toDo: ToDoViewModel, onItemChecked: (String) -> Unit) {
     var image by remember {
         mutableStateOf(toDo.getStarImage())
     }
@@ -89,22 +65,22 @@ private fun ToDoIcon(modifier: Modifier, toDo: ToDo, onItemChecked: (String) -> 
 }
 
 private fun imageVector(image: ImageVector) =
-    if (image == Outlined.StarBorder) {
-        Outlined.Star
+    if (image == Icons.Outlined.StarBorder) {
+        Icons.Outlined.Star
     } else {
-        Outlined.StarBorder
+        Icons.Outlined.StarBorder
     }
 
-private fun ToDo.getStarImage() =
+private fun ToDoViewModel.getStarImage() =
     if (starred) {
-        Outlined.Star
+        Icons.Outlined.Star
     } else {
-        Outlined.StarBorder
+        Icons.Outlined.StarBorder
     }
 
 @Composable
 private fun ToDoCheckBox(
-    toDo: ToDo,
+    toDo: ToDoViewModel,
     onItemChecked: (String, Boolean) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }

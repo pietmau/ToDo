@@ -9,9 +9,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.pppp.todo.model.FakeData
-import com.pppp.todo.model.MainViewModel
-import com.pppp.todo.todo.ToDoList
+import com.pppp.todo.main.MainViewModel
+import com.pppp.todo.main.todo.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,11 +20,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val viewModel: MainViewModel by viewModels()
-        viewModel.fff()
         setContent {
             ToDoTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    ToDoList(FakeData.toDos())
+                    MainScreen(viewModel)
                 }
             }
         }

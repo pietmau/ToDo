@@ -1,4 +1,4 @@
-package com.pppp.todo.model
+package com.pppp.todo.main.model
 
 import com.pppp.entities.ToDo
 
