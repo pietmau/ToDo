@@ -16,7 +16,7 @@ import com.pppp.entities.ToDo
 import com.pppp.todo.main.ToDoViewModel
 
 @Composable
-fun ToDoItem(toDo: ToDoViewModel, onItemChecked: ((String, Boolean) -> Unit)) {
+fun ToDoItem(modifier: Modifier,toDo: ToDoViewModel, onItemChecked: ((String, Boolean) -> Unit)) {
     Surface(
         modifier = Modifier.padding(
             PaddingValues(

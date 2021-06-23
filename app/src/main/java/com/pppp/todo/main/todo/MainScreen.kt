@@ -1,54 +1,84 @@
 package com.pppp.todo.main.todo
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons.Outlined
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.StarBorder
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pppp.entities.ToDo
+import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainViewModel
 import com.pppp.todo.main.TodoMainViewModel
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.*
-import com.pppp.todo.main.ToDoViewModel
-
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val state: TodoMainViewModel by viewModel.uiState.collectAsState()
-    Scaffold {
+    Scaffold(
+        floatingActionButton = { Fab() }
+    ) {
         ToDoScreen(state)
     }
 }
 
 @Composable
-private fun ToDoScreen(state: TodoMainViewModel) {
-    when (state) {
-        is TodoMainViewModel.Data -> Data(state)
-        is TodoMainViewModel.Loading -> Loading()
-    }.let { }
+fun Fab() {
+    FloatingActionButton(
+        onClick = {},
+        content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
+    )
 }
 
 @Composable
-fun Data(state: TodoMainViewModel.Data) {
-    LazyColumn {
-        items(state.todos) {
-            ToDoItem(toDo = it) { id, selected -> }
+private fun ToDoScreen(state: TodoMainViewModel) {
+    when (state) {
+        is TodoMainViewModel.Data -> ListOfToDos(state)
+        is TodoMainViewModel.Loading -> Loading()
+    }.exaustive
+}
+
+@Composable
+fun ListOfToDos(state: TodoMainViewModel.Data) {
+    LazyColumn(Modifier.fillMaxHeight()) {
+        itemsIndexed(state.todos) { index, item ->
+            val bottomPadding = if (index == state.todos.size - 1) 4.dp else 0.dp
+            ToDoItem(
+                modifier = Modifier.padding(
+                    PaddingValues(
+                        start = 4.dp,
+                        end = 4.dp,
+                        top = 4.dp,
+                        bottom = bottomPadding
+                    )
+                ),
+                toDo = item
+            ) { id, selected -> }
         }
     }
 }
 
 @Composable
 fun Loading() {
-    CircularProgressIndicator()
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            Modifier.size(96.dp)
+        )
+    }
 }
 
 @Preview
@@ -57,4 +87,10 @@ fun LoadingPreview() {
     Loading()
 }
 
-
+@Preview
+@Composable
+fun Main() {
+    Scaffold {
+        ToDoScreen(TodoMainViewModel.Loading)
+    }
+}

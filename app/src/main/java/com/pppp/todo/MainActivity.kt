@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val viewModel: MainViewModel by viewModels()
+
         setContent {
             ToDoTheme {
                 Surface(color = MaterialTheme.colors.background) {
