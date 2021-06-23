@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pppp.entities.ToDo
@@ -60,20 +61,20 @@ fun ToDoListItem(toDo: ToDo, onItemChecked: ((Long, Boolean) -> Unit)) {
                 .padding(8.dp)
                 .fillMaxWidth(),
         ) {
-            ToDoCheckBox(onItemChecked, toDo)
+            ToDoCheckBox(toDo, onItemChecked)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = toDo.title,
                 modifier = Modifier.weight(1F, true)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ToDoIcon(Modifier, toDo)
+            ToDoIcon(Modifier, toDo, {})
         }
     }
 }
 
 @Composable
-private fun ToDoIcon(modifier: Modifier, toDo: ToDo) {
+private fun ToDoIcon(modifier: Modifier, toDo: ToDo, onItemChecked: (Long) -> Unit) {
     var image by remember {
         mutableStateOf(toDo.getStarImage())
     }
@@ -81,14 +82,18 @@ private fun ToDoIcon(modifier: Modifier, toDo: ToDo) {
         imageVector = image,
         contentDescription = null,
         modifier = modifier.clickable {
-            image = if (image == Outlined.StarBorder) {
-                Outlined.Star
-            } else {
-                Outlined.StarBorder
-            }
+            onItemChecked(toDo.id)
+            image = imageVector(image)
         }
     )
 }
+
+private fun imageVector(image: ImageVector) =
+    if (image == Outlined.StarBorder) {
+        Outlined.Star
+    } else {
+        Outlined.StarBorder
+    }
 
 private fun ToDo.getStarImage() =
     if (starred) {
@@ -99,13 +104,13 @@ private fun ToDo.getStarImage() =
 
 @Composable
 private fun ToDoCheckBox(
-    onItemChecked: (Long, Boolean) -> Unit,
-    toDo: ToDo
+    toDo: ToDo,
+    onItemChecked: (Long, Boolean) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {
         isChecked = it
-        onItemChecked.invoke(toDo.id, it)
+        onItemChecked(toDo.id, it)
     })
 }
 
