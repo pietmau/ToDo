@@ -20,12 +20,12 @@ import com.pppp.todo.main.TodoMainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@ExperimentalMaterialApi
+
 @Composable
 fun MainScreen(mainViewModel: MainViewModel) {
     val state: TodoMainViewModel by mainViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    BottomSheetScaffold(
+    Scaffold(
         scaffoldState = bottomSheetScaffoldState(state),
         floatingActionButton = { Fab { onFabClickd(coroutineScope, mainViewModel) } },
         sheetContent = { AddToDo() }
@@ -45,20 +45,20 @@ private fun onFabClickd(
 
 @ExperimentalMaterialApi
 @Composable
-private fun bottomSheetScaffoldState(state: TodoMainViewModel) =
-    rememberBottomSheetScaffoldState(
-        bottomSheetState = if (state.addTodoViewModel == null) {
-            BottomSheetState(Collapsed)
-        } else {
-            BottomSheetState(
-                Expanded
-            )
-        }
+private fun bottomSheetScaffoldState(state: TodoMainViewModel): BottomSheetScaffoldState {
+    val bottomSheetState = if (state.addTodoViewModel == null) {
+        BottomSheetState(Collapsed)
+    } else {
+        BottomSheetState(Expanded)
+    }
+    return rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
     )
+}
 
 @Composable
 fun AddToDo() {
-
+    Text(text = "dddd")
 }
 
 @Composable
@@ -72,7 +72,7 @@ fun Fab(onClick: () -> Unit) {
 @Composable
 private fun ToDoScreen(state: TodoMainViewModel) {
     when (state.isLoading) {
-        false -> ListOfToDos(state)
+        true -> ListOfToDos(state)
         else -> Loading()
     }.exaustive
 }

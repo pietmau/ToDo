@@ -10,6 +10,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.pppp.todo.main.MainViewModel
 import com.pppp.todo.main.todo.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
@@ -24,13 +25,13 @@ class MainActivity : ComponentActivity() {
         val viewModel: MainViewModel by viewModels()
 
         setContent {
-            ToDoTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    MainScreen(viewModel)
+                ToDoTheme {
+                    Surface(color = MaterialTheme.colors.background) {
+                        MainScreen(viewModel)
+                    }
                 }
             }
         }
-    }
 }
 
 @Composable
