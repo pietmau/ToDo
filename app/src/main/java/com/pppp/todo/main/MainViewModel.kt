@@ -3,41 +3,36 @@ package com.pppp.todo.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pppp.entities.ToDo
-import com.pppp.usecases.Repository
+import com.pppp.todo.Consumer
+import com.pppp.todo.exaustive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.pppp.usecases.todolist.ToDoListUseCase
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: Repository,
-    private val mapper: @JvmSuppressWildcards (List<ToDo>) -> TodoMainViewModel
-) : ViewModel() {
+    private val toDoListUseCase: ToDoListUseCase,
+    private val mapper: @JvmSuppressWildcards (Result<List<ToDo>>) -> TodoMainViewModel
+) : ViewModel(), Consumer<ToDoViewEvent> {
 
     private val _uiState: MutableStateFlow<TodoMainViewModel> =
-        MutableStateFlow(TodoMainViewModel.Loading)
-
+        MutableStateFlow(TodoMainViewModel())
     val uiState: StateFlow<TodoMainViewModel> get() = _uiState
 
     init {
         viewModelScope.launch {
-            try {
-                val todos = repository.getToDos()
-                _uiState.value = mapper(todos)
-            } catch (exception: Exception) {
-                _uiState.value =
-                    TodoMainViewModel.Data(
-                        error = ErrorMessage(
-                            message = exception.message ?: ERROR
-                        )
-                    )
-            }
+            _uiState.value = mapper(toDoListUseCase())
         }
     }
 
-    private companion object {
-        private const val ERROR = "Error"
+    override fun invoke(event: ToDoViewEvent) {
+        when (event) {
+            is ToDoViewEvent.OnFabClicked -> {
+                _uiState.value = _uiState.value.copy(addTodoViewModel = AddTodoViewModel())
+            }
+        }.exaustive
     }
 }

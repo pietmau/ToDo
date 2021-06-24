@@ -1,69 +1,80 @@
 package com.pppp.todo.main.todo
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
+import androidx.compose.material.BottomSheetValue.Collapsed
+import androidx.compose.material.BottomSheetValue.Expanded
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainViewModel
+import com.pppp.todo.main.ToDoViewEvent
 import com.pppp.todo.main.TodoMainViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
+@ExperimentalMaterialApi
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
-    val state: TodoMainViewModel by viewModel.uiState.collectAsState()
-    Scaffold(
-        floatingActionButton = { Fab() }
+fun MainScreen(mainViewModel: MainViewModel) {
+    val state: TodoMainViewModel by mainViewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetScaffoldState(state),
+        floatingActionButton = { Fab { onFabClickd(coroutineScope, mainViewModel) } },
+        sheetContent = { AddToDo() }
     ) {
         ToDoScreen(state)
     }
 }
 
+private fun onFabClickd(
+    coroutineScope: CoroutineScope,
+    model: MainViewModel
+) {
+    coroutineScope.launch {
+        model(ToDoViewEvent.OnFabClicked)
+    }
+}
+
+@ExperimentalMaterialApi
 @Composable
-fun Fab() {
+private fun bottomSheetScaffoldState(state: TodoMainViewModel) =
+    rememberBottomSheetScaffoldState(
+        bottomSheetState = if (state.addTodoViewModel == null) {
+            BottomSheetState(Collapsed)
+        } else {
+            BottomSheetState(
+                Expanded
+            )
+        }
+    )
+
+@Composable
+fun AddToDo() {
+
+}
+
+@Composable
+fun Fab(onClick: () -> Unit) {
     FloatingActionButton(
-        onClick = {},
+        onClick = onClick,
         content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
     )
 }
 
 @Composable
 private fun ToDoScreen(state: TodoMainViewModel) {
-    when (state) {
-        is TodoMainViewModel.Data -> ListOfToDos(state)
-        is TodoMainViewModel.Loading -> Loading()
+    when (state.isLoading) {
+        false -> ListOfToDos(state)
+        else -> Loading()
     }.exaustive
-}
-
-@Composable
-fun ListOfToDos(state: TodoMainViewModel.Data) {
-    LazyColumn(Modifier.fillMaxHeight()) {
-        itemsIndexed(state.todos) { index, item ->
-            val bottomPadding = if (index == state.todos.size - 1) 4.dp else 0.dp
-            ToDoItem(
-                modifier = Modifier.padding(
-                    PaddingValues(
-                        start = 4.dp,
-                        end = 4.dp,
-                        top = 4.dp,
-                        bottom = bottomPadding
-                    )
-                ),
-                toDo = item
-            ) { id, selected -> }
-        }
-    }
 }
 
 @Composable
@@ -78,19 +89,5 @@ fun Loading() {
         CircularProgressIndicator(
             Modifier.size(96.dp)
         )
-    }
-}
-
-@Preview
-@Composable
-fun LoadingPreview() {
-    Loading()
-}
-
-@Preview
-@Composable
-fun Main() {
-    Scaffold {
-        ToDoScreen(TodoMainViewModel.Loading)
     }
 }
