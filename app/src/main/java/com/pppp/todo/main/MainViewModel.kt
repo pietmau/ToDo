@@ -13,9 +13,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.pppp.usecases.todolist.ToDoListUseCase
 import kotlinx.coroutines.flow.collect
+import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
+import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
+import com.pppp.usecases.EditToDoUseCase
+import com.pppp.usecases.EditToDoUseCase.Params
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val editToDoUseCase: EditToDoUseCase,
     private val toDoListUseCase: ToDoListUseCase,
     private val addTodoViewModel: AddToDoUseCase,
     private val mapper: @JvmSuppressWildcards (List<ToDo>) -> TodoMainViewModel
@@ -29,18 +34,25 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             toDoListUseCase().collect {
-                _uiState.value = mapper(it)
+                _uiState.value = mapper(it.filterNot { it.completed == true })
             }
         }
     }
 
     override fun invoke(event: ToDoViewEvent) {
         when (event) {
-            is ToDoViewEvent.OnToDoAdded -> addTodoViewModel(event.text)
+            is OnToDoAdded -> addToDo(event.text)
+            is OnToDoCompleted -> completeToDo(event.id, event.completed)
         }.exaustive
     }
 
-    private fun addTodoViewModel(title: String) =
+    private fun completeToDo(id: String, completed: Boolean) {
+        viewModelScope.launch {
+            editToDoUseCase.invoke(Params(id, mapOf("completed" to completed)))
+        }
+    }
+
+    private fun addToDo(title: String) =
         viewModelScope.launch {
             addTodoViewModel.invoke(title)
         }

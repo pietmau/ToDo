@@ -46,6 +46,10 @@ class FirebaseRepository(
         )
     }
 
+    override fun edit(id: String, toDo: Map<String, Any?>) {
+        db.collection(TODOS).document(id).update(toDo)
+    }
+
     companion object {
         const val TODOS = "todos"
         const val TITLE = "title"

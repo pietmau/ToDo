@@ -4,5 +4,6 @@ data class ToDo(
     val id: String? = null,
     val title: String,
     val starred: Boolean = false,
-    val created: Long? = null
+    val created: Long? = null,
+    val completed: Boolean? = false
 )

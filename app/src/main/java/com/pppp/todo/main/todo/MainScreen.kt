@@ -3,6 +3,7 @@ package com.pppp.todo.main.todo
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
@@ -10,15 +11,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainViewModel
+import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
+import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
 import com.pppp.todo.main.TodoMainViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.material.ModalBottomSheetValue.Hidden
-import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen(mainViewModel: MainViewModel) {
@@ -43,7 +46,9 @@ fun MainScreen(mainViewModel: MainViewModel) {
                 BottomAppBar {}
             }
         ) {
-            Content(state)
+            Content(state) { id, checked ->
+                mainViewModel(OnToDoCompleted(id, checked))
+            }
         }
         BottomSheet(modalBottomSheetState) {
             coroutineScope.launch {
@@ -69,6 +74,7 @@ fun Fab(onClick: () -> Unit) {
     )
 }
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 private fun BottomSheet(
@@ -86,9 +92,12 @@ private fun BottomSheet(
 }
 
 @Composable
-private fun Content(state: TodoMainViewModel) {
+private fun Content(
+    state: TodoMainViewModel,
+    onItemChecked: (String, Boolean) -> Unit = { _, _ -> }
+) {
     when (state.isLoading) {
-        true -> ListOfToDos(state)
+        true -> ListOfToDos(state, onItemChecked)
         else -> Loading()
     }.exaustive
 }

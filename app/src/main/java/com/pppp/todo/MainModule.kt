@@ -6,6 +6,7 @@ import com.pppp.database.FirebaseRepository
 import com.pppp.entities.ToDo
 import com.pppp.todo.main.TodoMainViewModel
 import com.pppp.todo.main.mapper.Mapper
+import com.pppp.usecases.EditToDoUseCase
 import com.pppp.usecases.Repository
 import com.pppp.usecases.addtodo.AddToDoUseCase
 import com.pppp.usecases.todolist.ToDoListUseCase
@@ -30,5 +31,8 @@ abstract class MainModule {
 
         @Provides
         fun addToDoUseCase(repository: Repository): AddToDoUseCase = AddToDoUseCase(repository)
+
+        @Provides
+        fun editToDoUseCase(repository: Repository): EditToDoUseCase = EditToDoUseCase(repository)
     }
 }
