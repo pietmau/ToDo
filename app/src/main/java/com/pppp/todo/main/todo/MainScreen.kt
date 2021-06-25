@@ -1,6 +1,7 @@
 package com.pppp.todo.main.todo
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -16,7 +17,7 @@ import com.pppp.todo.main.MainViewModel
 import com.pppp.todo.main.TodoMainViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material.ModalBottomSheetValue.Hidden
-import kotlinx.coroutines.CoroutineScope
+import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
 
 @ExperimentalMaterialApi
 @Composable
@@ -28,7 +29,13 @@ fun MainScreen(mainViewModel: MainViewModel) {
         Scaffold(
             floatingActionButton = {
                 Fab {
-                    toggleBottomSheet(coroutineScope, modalBottomSheetState)
+                    coroutineScope.launch {
+                        if (modalBottomSheetState.isVisible) {
+                            modalBottomSheetState.hide()
+                        } else {
+                            modalBottomSheetState.show()
+                        }
+                    }
                 }
             },
             isFloatingActionButtonDocked = true,
@@ -38,32 +45,25 @@ fun MainScreen(mainViewModel: MainViewModel) {
         ) {
             Content(state)
         }
-        BottomSheetLayout(modalBottomSheetState)
-    }
-}
-
-@ExperimentalMaterialApi
-private fun toggleBottomSheet(
-    coroutineScope: CoroutineScope,
-    modalBottomSheetState: ModalBottomSheetState
-) {
-    coroutineScope.launch {
-        if (modalBottomSheetState.isVisible) {
-            modalBottomSheetState.hide()
-        } else {
-            modalBottomSheetState.show()
+        BottomSheet(modalBottomSheetState) {
+            coroutineScope.launch {
+                if (modalBottomSheetState.isVisible) {
+                    modalBottomSheetState.hide()
+                } else {
+                    modalBottomSheetState.show()
+                }
+            }
+            coroutineScope.launch {
+                mainViewModel(OnToDoAdded(it))
+            }
         }
     }
 }
 
 @Composable
-fun AddToDo() {
-    Text(text = "dddd")
-}
-
-@Composable
 fun Fab(onClick: () -> Unit) {
     FloatingActionButton(
+        modifier = Modifier.size(48.dp),
         onClick = onClick,
         content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
     )
@@ -71,15 +71,16 @@ fun Fab(onClick: () -> Unit) {
 
 @ExperimentalMaterialApi
 @Composable
-private fun BottomSheetLayout(
-    modalBottomSheetState: ModalBottomSheetState
+private fun BottomSheet(
+    modalBottomSheetState: ModalBottomSheetState,
+    onToDoAdded: (String) -> Unit = {}
 ) {
-
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetContent = {
-            AddToDo()
+            AddToDo(onToDoAdded)
         },
+        sheetShape = RoundedCornerShape(4.dp),
         content = {}
     )
 }

@@ -1,5 +1,5 @@
 package com.pppp.todo.main
 
 sealed class ToDoViewEvent {
-    object OnFabClicked : ToDoViewEvent()
+    data class OnToDoAdded(val text: String) : ToDoViewEvent()
 }

@@ -11,13 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pppp.entities.ToDo
 import com.pppp.todo.main.ToDoViewModel
 
 @Composable
-fun ToDoItem(modifier: Modifier,toDo: ToDoViewModel, onItemChecked: ((String, Boolean) -> Unit)) {
-    Surface(
+fun ToDoItem(
+    toDo: ToDoViewModel,
+    onItemChecked: (String, Boolean) -> Unit
+) {
+    Card(
         modifier = Modifier.padding(
             PaddingValues(
                 start = 4.dp,
@@ -90,3 +93,8 @@ private fun ToDoCheckBox(
     })
 }
 
+@Preview
+@Composable
+fun ToDoItemPreview() {
+    ToDoItem(ToDoViewModel("", "Foo", true), { id, starred -> })
+}

@@ -7,6 +7,7 @@ import com.pppp.entities.ToDo
 import com.pppp.todo.main.TodoMainViewModel
 import com.pppp.todo.main.mapper.Mapper
 import com.pppp.usecases.Repository
+import com.pppp.usecases.addtodo.AddToDoUseCase
 import com.pppp.usecases.todolist.ToDoListUseCase
 import dagger.Module
 import dagger.Provides
@@ -19,12 +20,15 @@ abstract class MainModule {
 
     companion object {
         @Provides
-        fun bindsMapper(): @JvmSuppressWildcards (Result<List<ToDo>>) -> TodoMainViewModel = Mapper()
+        fun bindsMapper(): @JvmSuppressWildcards (List<ToDo>) -> TodoMainViewModel = Mapper()
 
         @Provides
         fun provideRepository(): Repository = FirebaseRepository(Firebase.firestore)
 
         @Provides
-        fun provideUseCase(repository: Repository):ToDoListUseCase = ToDoListUseCase(repository)
+        fun toDoListUseCase(repository: Repository): ToDoListUseCase = ToDoListUseCase(repository)
+
+        @Provides
+        fun addToDoUseCase(repository: Repository): AddToDoUseCase = AddToDoUseCase(repository)
     }
 }
