@@ -1,6 +1,7 @@
 package com.pppp.todo.main.todo
 
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -10,7 +11,10 @@ import com.pppp.todo.main.TodoMainViewModel
 
 @Composable
 fun ListOfToDos(state: TodoMainViewModel) {
-    LazyColumn(Modifier.fillMaxHeight()) {
+    LazyColumn(
+        Modifier
+            .fillMaxHeight()
+            .padding(0.dp, 0.dp, 0.dp, 56.dp)) {
         itemsIndexed(state.todos) { index, item ->
             val bottomPadding = if (index == state.todos.size - 1) 4.dp else 0.dp
             ToDoItem(

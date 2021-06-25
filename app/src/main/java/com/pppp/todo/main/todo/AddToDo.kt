@@ -7,25 +7,28 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.ModalBottomSheetValue.Expanded
-import androidx.compose.runtime.saveable.rememberSaveable
-import com.pppp.entities.ToDo
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun AddToDo(
@@ -36,12 +39,16 @@ fun AddToDo(
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
 private fun AddToDoInputControl(onToDoAdded: (String) -> Unit = {}) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         var isError by rememberSaveable { mutableStateOf(false) }
         var textState by rememberSaveable { mutableStateOf("") }
+        val keyboardController = LocalSoftwareKeyboardController.current
+
         val onDone: () -> Unit = {
+            keyboardController?.hide()
             if (textState.isEmpty()) {
                 isError = true
             } else {
@@ -79,6 +86,7 @@ private fun AddToDoInputControl(onToDoAdded: (String) -> Unit = {}) {
     }
 }
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Preview
 @Composable
