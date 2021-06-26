@@ -5,5 +5,6 @@ data class ToDo(
     val title: String,
     val starred: Boolean = false,
     val created: Long? = null,
-    val completed: Boolean? = false
+    val completed: Boolean? = false,
+    val due: Long? = null
 )

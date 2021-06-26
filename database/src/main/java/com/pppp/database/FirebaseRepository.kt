@@ -1,10 +1,9 @@
 package com.pppp.database
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import com.pppp.database.FirebaseRepository.Companion.COMPLETED
 import com.pppp.database.FirebaseRepository.Companion.CREATED
+import com.pppp.database.FirebaseRepository.Companion.DUE
 import com.pppp.database.FirebaseRepository.Companion.EMPTY_STRING
 import com.pppp.database.FirebaseRepository.Companion.STARRED
 import com.pppp.database.FirebaseRepository.Companion.TITLE
@@ -42,37 +41,41 @@ class FirebaseRepository(
     override suspend fun addToDo(params: AddToDoUseCase.Params) {
         db.collection(TODOS).add(
             ToDo(
-                title = params,
-                created = System.currentTimeMillis()
+                title = params.title,
+                created = System.currentTimeMillis(),
+                due = params.due
             )
-        )
+        ).addOnSuccessListener { document ->
+            db.runTransaction { transaction ->
+                transaction.update(document, mapOf(ID to document.id))
+            }
+        }
     }
 
-    override fun edit(id: String, toDo: Map<String, Any?>) {
-        db.collection(TODOS).document(id).update(toDo)
-    }
-
-    private fun f() {
-
+    override fun edit(id: String, values: Map<String, Any?>) {
+        db.collection(TODOS).document(id).update(values)
     }
 
     companion object {
+        const val ID = "id"
         const val TODOS = "todos"
         const val TITLE = "title"
         const val STARRED = "starred"
         const val CREATED = "created"
         const val COMPLETED = "completed"
+        const val DUE = "due"
         const val EMPTY_STRING = ""
     }
 }
 
 private fun QuerySnapshot?.toToDoList(): List<ToDo> =
-    this?.documents?.map {
-        ToDo(
-            id = it.id,
-            title = it.get(TITLE, String::class.java) ?: EMPTY_STRING,
-            starred = it.getBoolean(STARRED) ?: false,
-            created = it.get(CREATED, Long::class.java),
-            completed = it.getBoolean(COMPLETED)
-        )
-    }?.sortedBy { it.created } ?: emptyList()
+    this?.documents?.map { it.toToDo() }?.sortedBy { it.due } ?: emptyList()
+
+private fun DocumentSnapshot.toToDo() = ToDo(
+    id = this.id,
+    title = this.get(TITLE, String::class.java) ?: EMPTY_STRING,
+    starred = this.getBoolean(STARRED) ?: false,
+    created = this.get(CREATED, Long::class.java),
+    completed = this.getBoolean(COMPLETED),
+    due = this.get(DUE, Long::class.java),
+)

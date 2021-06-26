@@ -10,5 +10,5 @@ interface Repository {
 
     suspend fun addToDo(params: AddToDoUseCase.Params)
 
-    fun edit(toDo1: String, toDo: Map<String, Any?>)
+    fun edit(id: String, values: Map<String, Any?>)
 }
