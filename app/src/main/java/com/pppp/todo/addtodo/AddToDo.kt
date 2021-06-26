@@ -24,9 +24,9 @@ import com.pppp.todo.main.ToDoViewEvent
 import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
 import com.pppp.todo.toDueDateText
+import com.pppp.todo.toEpochMillis
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
-import java.time.ZoneId
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -84,7 +84,7 @@ private fun Calendar(state: MutableState<AddTodoViewState>) {
     dialog.build {
         datetimepicker {
             state.value = state.value.copy(
-                dueDate = it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                dueDate = it.toEpochMillis()
             )
         }
     }

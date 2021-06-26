@@ -1,6 +1,8 @@
 package com.pppp.todo
 
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 val Any?.exaustive
@@ -12,3 +14,5 @@ interface Consumer<T> {
 
 fun Long.toDueDateText() =
     SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(this))
+
+fun LocalDateTime.toEpochMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
