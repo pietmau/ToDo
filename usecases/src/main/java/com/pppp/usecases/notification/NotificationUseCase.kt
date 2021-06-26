@@ -10,7 +10,8 @@ class NotificationUseCase(private val notificationScheduler: NotificationSchedul
             notificationScheduler.schedule(
                 NotificationScheduler.Params(
                     text = params.text,
-                    timeInMills = it
+                    timeInMills = it,
+                    id = params.id
                 )
             )
         }
@@ -19,5 +20,6 @@ class NotificationUseCase(private val notificationScheduler: NotificationSchedul
     data class Params(
         val text: String,
         val timeInMills: Long? = null,
+        val id: String
     )
 }

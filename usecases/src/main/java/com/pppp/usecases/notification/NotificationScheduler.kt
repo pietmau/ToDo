@@ -7,5 +7,6 @@ interface NotificationScheduler {
     data class Params(
         val text: String,
         val timeInMills: Long,
+        val id: String
     )
 }

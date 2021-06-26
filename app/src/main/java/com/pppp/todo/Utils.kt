@@ -16,3 +16,6 @@ fun Long.toDueDateText() =
     SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(this))
 
 fun LocalDateTime.toEpochMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+fun Long.toDueDateNotificationText() =
+    SimpleDateFormat("EEE, dd MMMM HH:mm", Locale.getDefault()).format(Date(this))

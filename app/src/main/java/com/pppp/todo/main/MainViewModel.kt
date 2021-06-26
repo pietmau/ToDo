@@ -52,12 +52,18 @@ class MainViewModel @Inject constructor(
 
     private fun addToDo(title: String, due: Long?) =
         launch {
-            addTodoViewModel(
+            val id = addTodoViewModel(
                 AddToDoUseCase.Params(
                     title = title,
                     due = due
                 )
             )
-            notificationUseCase(NotificationUseCase.Params(text = title, timeInMills = due))
+            notificationUseCase(
+                NotificationUseCase.Params(
+                    text = title,
+                    timeInMills = due,
+                    id = id,
+                )
+            )
         }
 }

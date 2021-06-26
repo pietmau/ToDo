@@ -15,6 +15,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class FirebaseRepository(
     private val db: FirebaseFirestore
@@ -40,19 +43,21 @@ class FirebaseRepository(
             }
         }
 
-    override suspend fun addToDo(params: AddToDoUseCase.Params) {
-        db.collection(TODOS).add(
-            ToDo(
-                title = params.title,
-                created = System.currentTimeMillis(),
-                due = params.due
-            )
-        ).addOnSuccessListener { document ->
-            db.runTransaction { transaction ->
-                transaction.update(document, mapOf(ID to document.id))
+    override suspend fun addToDo(params: AddToDoUseCase.Params): String =
+        suspendCoroutine { continuation ->
+            db.collection(TODOS).add(
+                ToDo(
+                    title = params.title,
+                    created = System.currentTimeMillis(),
+                    due = params.due
+                )
+            ).addOnSuccessListener { document ->
+                db.runTransaction { transaction ->
+                    transaction.update(document, mapOf(ID to document.id))
+                }
+                continuation.resume(document.id)
             }
         }
-    }
 
     override fun edit(id: String, values: Map<String, Any?>) {
         db.collection(TODOS).document(id).update(values)

@@ -8,7 +8,7 @@ interface Repository {
 
     suspend fun getToDos(): Flow<List<ToDo>>
 
-    suspend fun addToDo(params: AddToDoUseCase.Params)
+    suspend fun addToDo(params: AddToDoUseCase.Params): String
 
     fun edit(id: String, values: Map<String, Any?>)
 }
