@@ -3,6 +3,7 @@ package com.pppp.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.QuerySnapshot
+import com.pppp.database.FirebaseRepository.Companion.COMPLETED
 import com.pppp.database.FirebaseRepository.Companion.CREATED
 import com.pppp.database.FirebaseRepository.Companion.EMPTY_STRING
 import com.pppp.database.FirebaseRepository.Companion.STARRED
@@ -50,11 +51,16 @@ class FirebaseRepository(
         db.collection(TODOS).document(id).update(toDo)
     }
 
+    private fun f() {
+
+    }
+
     companion object {
         const val TODOS = "todos"
         const val TITLE = "title"
         const val STARRED = "starred"
         const val CREATED = "created"
+        const val COMPLETED = "completed"
         const val EMPTY_STRING = ""
     }
 }
@@ -65,6 +71,7 @@ private fun QuerySnapshot?.toToDoList(): List<ToDo> =
             id = it.id,
             title = it.get(TITLE, String::class.java) ?: EMPTY_STRING,
             starred = it.getBoolean(STARRED) ?: false,
-            created = it.get(CREATED, Long::class.java)
+            created = it.get(CREATED, Long::class.java),
+            completed = it.getBoolean(COMPLETED)
         )
     }?.sortedBy { it.created } ?: emptyList()
