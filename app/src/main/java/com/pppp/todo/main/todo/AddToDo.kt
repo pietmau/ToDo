@@ -22,6 +22,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pppp.todo.main.ToDoViewEvent
+import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
+import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 
@@ -29,16 +32,16 @@ import com.vanpra.composematerialdialogs.datetime.datetimepicker
 @ExperimentalMaterialApi
 @Composable
 fun AddToDo(
-    onToDoAdded: (String) -> Unit = {}
+    onEvent: (ToDoViewEvent) -> Unit = {}
 ) {
-    Column(modifier = Modifier.padding(start = 16.dp,end = 16.dp, top = 16.dp, bottom = 8.dp)) {
-        AddToDoInputControl(onToDoAdded)
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)) {
+        AddToDoInputControl(onEvent)
     }
 }
 
 @ExperimentalComposeUiApi
 @Composable
-private fun AddToDoInputControl(onToDoAdded: (String) -> Unit = {}) {
+private fun AddToDoInputControl(onEvent: (ToDoViewEvent) -> Unit = {}) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             var isError by rememberSaveable { mutableStateOf(false) }
@@ -50,7 +53,8 @@ private fun AddToDoInputControl(onToDoAdded: (String) -> Unit = {}) {
                 if (textState.isEmpty()) {
                     isError = true
                 } else {
-                    onToDoAdded(textState)
+                    onEvent(OnAddToDoClicked)
+                    onEvent(OnToDoAdded(textState))
                     textState = ""
                 }
             }

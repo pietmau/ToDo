@@ -6,39 +6,44 @@ import androidx.compose.material.*
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainViewModel
-import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
-import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
-import com.pppp.todo.main.TodoMainViewModel
-import kotlinx.coroutines.launch
+import com.pppp.todo.main.ToDoViewEvent
+import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.TodoMainViewModel as TodoMainViewModel1
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun MainScreen(mainViewModel: MainViewModel) {
-    val state: TodoMainViewModel by mainViewModel.uiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val modalBottomSheetState = rememberModalBottomSheetState(Hidden)
+fun MainScreen(viewModel: MainViewModel) {
+    val state by viewModel.uiState.collectAsState()
+    MainScreenImpl(state) {
+        viewModel(it)
+    }
+}
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+private fun MainScreenImpl(state: TodoMainViewModel1, onEvent: (ToDoViewEvent) -> Unit) {
+    var modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(Hidden)
+    LaunchedEffect(state.isAddTodoShowing) {
+        if (state.isAddTodoShowing) {
+            modalBottomSheetState.show()
+        } else {
+            modalBottomSheetState.hide()
+        }
+    }
     Box {
         Scaffold(
             floatingActionButton = {
                 Fab {
-                    coroutineScope.launch {
-                        if (modalBottomSheetState.isVisible) {
-                            modalBottomSheetState.hide()
-                        } else {
-                            modalBottomSheetState.show()
-                        }
-                    }
+                    onEvent(OnAddToDoClicked)
                 }
             },
             isFloatingActionButtonDocked = true,
@@ -46,22 +51,17 @@ fun MainScreen(mainViewModel: MainViewModel) {
                 BottomAppBar {}
             }
         ) {
-            Content(state) { id, checked ->
-                mainViewModel(OnToDoCompleted(id, checked))
-            }
+            Content(state, onEvent)
         }
-        BottomSheet(modalBottomSheetState) {
-            coroutineScope.launch {
-                if (modalBottomSheetState.isVisible) {
-                    modalBottomSheetState.hide()
-                } else {
-                    modalBottomSheetState.show()
-                }
-            }
-            coroutineScope.launch {
-                mainViewModel(OnToDoAdded(it))
-            }
-        }
+
+        ModalBottomSheetLayout(
+            sheetState = modalBottomSheetState,
+            sheetContent = {
+                AddToDo(onEvent)
+            },
+            sheetShape = RoundedCornerShape(4.dp),
+            content = {}
+        )
     }
 }
 
@@ -74,30 +74,13 @@ fun Fab(onClick: () -> Unit) {
     )
 }
 
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Composable
-private fun BottomSheet(
-    modalBottomSheetState: ModalBottomSheetState,
-    onToDoAdded: (String) -> Unit = {}
-) {
-    ModalBottomSheetLayout(
-        sheetState = modalBottomSheetState,
-        sheetContent = {
-            AddToDo(onToDoAdded)
-        },
-        sheetShape = RoundedCornerShape(4.dp),
-        content = {}
-    )
-}
-
 @Composable
 private fun Content(
-    state: TodoMainViewModel,
-    onItemChecked: (String, Boolean) -> Unit = { _, _ -> }
+    state: TodoMainViewModel1,
+    onEvent: (ToDoViewEvent) -> Unit = { _ -> }
 ) {
     when (state.isLoading) {
-        true -> ListOfToDos(state, onItemChecked)
+        true -> ListOfToDos(state, onEvent)
         else -> Loading()
     }.exaustive
 }

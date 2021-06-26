@@ -43,7 +43,13 @@ class MainViewModel @Inject constructor(
         when (event) {
             is OnToDoAdded -> addToDo(event.text)
             is OnToDoCompleted -> completeToDo(event.id, event.completed)
+            is ToDoViewEvent.OnAddToDoClicked -> onAddToDoClicked()
         }.exaustive
+    }
+
+    private fun onAddToDoClicked() {
+        val isAddTodoShowing = _uiState.value.isAddTodoShowing
+        _uiState.value = _uiState.value.copy(isAddTodoShowing = !isAddTodoShowing)
     }
 
     private fun completeToDo(id: String, completed: Boolean) {

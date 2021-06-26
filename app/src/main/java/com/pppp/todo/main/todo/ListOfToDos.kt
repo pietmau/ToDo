@@ -13,7 +13,7 @@ import com.pppp.todo.main.TodoMainViewModel
 @Composable
 fun ListOfToDos(
     mainViewModel: TodoMainViewModel,
-    onItemChecked: (String, Boolean) -> Unit = { _, _ -> }
+    onEvent: (ToDoViewEvent) -> Unit = { _ -> }
 ) {
     LazyColumn(
         Modifier
@@ -26,7 +26,7 @@ fun ListOfToDos(
         ) { index, item ->
             ToDoItem(
                 toDo = item,
-                onItemChecked = onItemChecked
+                onEvent = onEvent
             )
         }
     }

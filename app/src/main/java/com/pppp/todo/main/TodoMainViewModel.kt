@@ -4,6 +4,7 @@ data class TodoMainViewModel(
     val isLoading: Boolean = true,
     val todos: List<ToDoViewModel> = emptyList(),
     val error: ErrorMessage? = null,
+    val isAddTodoShowing: Boolean = false
 )
 
 

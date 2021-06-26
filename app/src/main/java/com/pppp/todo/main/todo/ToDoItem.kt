@@ -13,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pppp.todo.main.ToDoViewEvent
+import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
 import com.pppp.todo.main.ToDoViewModel
 
 @Composable
 fun ToDoItem(
     toDo: ToDoViewModel,
-    onItemChecked: (String, Boolean) -> Unit
+    onEvent: (ToDoViewEvent) -> Unit
 ) {
     Card(
         modifier = Modifier.padding(
@@ -40,7 +42,7 @@ fun ToDoItem(
                 .padding(8.dp)
                 .fillMaxWidth(),
         ) {
-            ToDoCheckBox(toDo, onItemChecked)
+            ToDoCheckBox(toDo, onEvent)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = toDo.title,
@@ -62,12 +64,12 @@ private fun ToDoIcon(modifier: Modifier, toDo: ToDoViewModel, onItemChecked: (St
         contentDescription = null,
         modifier = modifier.clickable {
             onItemChecked(toDo.id)
-            image = imageVector(image)
+            image = getImage(image)
         }
     )
 }
 
-private fun imageVector(image: ImageVector) =
+private fun getImage(image: ImageVector) =
     if (image == Icons.Outlined.StarBorder) {
         Icons.Outlined.Star
     } else {
@@ -84,17 +86,17 @@ private fun ToDoViewModel.getStarImage() =
 @Composable
 private fun ToDoCheckBox(
     toDo: ToDoViewModel,
-    onItemChecked: (String, Boolean) -> Unit
+    onEvent: (ToDoViewEvent) -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {
         isChecked = it
-        onItemChecked(toDo.id, it)
+        onEvent(OnToDoCompleted(toDo.id, it))
     })
 }
 
 @Preview
 @Composable
 fun ToDoItemPreview() {
-    ToDoItem(ToDoViewModel("", "Foo", true), { id, starred -> })
+    ToDoItem(ToDoViewModel("", "Foo", true)) { }
 }
