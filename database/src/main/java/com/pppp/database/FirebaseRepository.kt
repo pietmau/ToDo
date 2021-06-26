@@ -10,6 +10,7 @@ import com.pppp.database.FirebaseRepository.Companion.TITLE
 import com.pppp.entities.ToDo
 import com.pppp.usecases.Repository
 import com.pppp.usecases.addtodo.AddToDoUseCase
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,7 @@ class FirebaseRepository(
     private val db: FirebaseFirestore
 ) : Repository {
 
+    @ExperimentalCoroutinesApi
     override suspend fun getToDos(): Flow<List<ToDo>> =
         callbackFlow {
             val registration: ListenerRegistration =

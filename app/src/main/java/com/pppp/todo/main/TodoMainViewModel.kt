@@ -8,6 +8,11 @@ data class TodoMainViewModel(
 )
 
 
-data class ToDoViewModel(val id: String, val title: String, val starred: Boolean = false)
+data class ToDoViewModel(
+    val id: String,
+    val title: String,
+    val starred: Boolean = false,
+    val due: Long? = null
+)
 
 data class ErrorMessage(val message: String)

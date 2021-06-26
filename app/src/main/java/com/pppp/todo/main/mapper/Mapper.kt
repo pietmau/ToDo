@@ -14,7 +14,8 @@ class Mapper @Inject constructor() : @JvmSuppressWildcards (List<ToDo>) -> TodoM
             ToDoViewModel(
                 id = it.id!!,
                 title = it.title,
-                starred = it.starred
+                starred = it.starred,
+                due = it.due
             )
         })
 }

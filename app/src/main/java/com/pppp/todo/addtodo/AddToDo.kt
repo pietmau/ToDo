@@ -23,13 +23,10 @@ import com.pppp.todo.addtodo.AddTodoViewState
 import com.pppp.todo.main.ToDoViewEvent
 import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
-import com.pppp.todo.ui.theme.ToDoTheme
+import com.pppp.todo.toDueDateText
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -107,18 +104,12 @@ private fun Calendar(state: MutableState<AddTodoViewState>) {
                 contentDescription = "",
             )
             Text(
-                text = getText(state),
+                text = state.value.dueDate?.toDueDateText() ?: "Due",//TODO extract
                 style = MaterialTheme.typography.caption
             )
         }
     }
 }
-
-fun getText(state: MutableState<AddTodoViewState>) =
-    state.value.dueDate?.let {
-        SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(it))
-    } ?: "Due"//TODO extract
-
 
 @Composable
 private fun DoneButton(onDone: () -> Unit) {

@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.pppp.todo.main.ToDoViewEvent
 import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
 import com.pppp.todo.main.ToDoViewModel
+import com.pppp.todo.toDueDateText
 
 @Composable
 fun ToDoItem(
@@ -49,13 +50,22 @@ fun ToDoItem(
                 modifier = Modifier.weight(1F, true)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ToDoIcon(Modifier, toDo) {}
+            Due(toDo)
+            Spacer(modifier = Modifier.width(8.dp))
+            Star(Modifier, toDo)
         }
     }
 }
 
 @Composable
-private fun ToDoIcon(modifier: Modifier, toDo: ToDoViewModel, onItemChecked: (String) -> Unit) {
+fun Due(toDo: ToDoViewModel) {
+    toDo.due?.let {
+        Text(text = it.toDueDateText())
+    }
+}
+
+@Composable
+private fun Star(modifier: Modifier, toDo: ToDoViewModel) {
     var image by remember {
         mutableStateOf(toDo.getStarImage())
     }
@@ -63,7 +73,6 @@ private fun ToDoIcon(modifier: Modifier, toDo: ToDoViewModel, onItemChecked: (St
         imageVector = image,
         contentDescription = null,
         modifier = modifier.clickable {
-            onItemChecked(toDo.id)
             image = getImage(image)
         }
     )
@@ -84,10 +93,7 @@ private fun ToDoViewModel.getStarImage() =
     }
 
 @Composable
-private fun ToDoCheckBox(
-    toDo: ToDoViewModel,
-    onEvent: (ToDoViewEvent) -> Unit
-) {
+private fun ToDoCheckBox(toDo: ToDoViewModel, onEvent: (ToDoViewEvent) -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {
         isChecked = it
@@ -98,5 +104,5 @@ private fun ToDoCheckBox(
 @Preview
 @Composable
 fun ToDoItemPreview() {
-    ToDoItem(ToDoViewModel("", "Foo", true)) { }
+    ToDoItem(ToDoViewModel("", "Foo", true, due = 1624717282382)) { }
 }
