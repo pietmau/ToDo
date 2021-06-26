@@ -5,18 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.pppp.entities.ToDo
 import com.pppp.todo.Consumer
 import com.pppp.todo.exaustive
-import com.pppp.usecases.addtodo.AddToDoUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.pppp.usecases.todolist.ToDoListUseCase
-import kotlinx.coroutines.flow.collect
 import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
 import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
 import com.pppp.usecases.EditToDoUseCase
-import com.pppp.usecases.EditToDoUseCase.Params
+import com.pppp.usecases.addtodo.AddToDoUseCase
+import com.pppp.usecases.todolist.ToDoListUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -41,7 +40,7 @@ class MainViewModel @Inject constructor(
 
     override fun invoke(event: ToDoViewEvent) {
         when (event) {
-            is OnToDoAdded -> addToDo(event.text)
+            is OnToDoAdded -> addToDo(event.text, event.due)
             is OnToDoCompleted -> completeToDo(event.id, event.completed)
             is ToDoViewEvent.OnAddToDoClicked -> onAddToDoClicked()
         }.exaustive
@@ -53,13 +52,24 @@ class MainViewModel @Inject constructor(
     }
 
     private fun completeToDo(id: String, completed: Boolean) {
-        viewModelScope.launch {
-            editToDoUseCase.invoke(Params(id, mapOf("completed" to completed)))
+        launch {
+            editToDoUseCase.invoke(EditToDoUseCase.Params(id, mapOf("completed" to completed)))
         }
     }
 
-    private fun addToDo(title: String) =
-        viewModelScope.launch {
-            addTodoViewModel.invoke(title)
+    private fun addToDo(title: String, due: Long?) =
+        launch {
+            addTodoViewModel.invoke(
+                AddToDoUseCase.Params(
+                    title = title,
+                    due = due
+                )
+            )
         }
+
+    private fun launch(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            block()
+        }
+    }
 }

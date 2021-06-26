@@ -10,6 +10,7 @@ import com.pppp.database.FirebaseRepository.Companion.STARRED
 import com.pppp.database.FirebaseRepository.Companion.TITLE
 import com.pppp.entities.ToDo
 import com.pppp.usecases.Repository
+import com.pppp.usecases.addtodo.AddToDoUseCase
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,7 @@ class FirebaseRepository(
             }
         }
 
-    override suspend fun addToDo(params: String) {
+    override suspend fun addToDo(params: AddToDoUseCase.Params) {
         db.collection(TODOS).add(
             ToDo(
                 title = params,

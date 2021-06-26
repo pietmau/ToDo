@@ -1,4 +1,4 @@
-package com.pppp.todo.main.todo
+package com.pppp.todo.main.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

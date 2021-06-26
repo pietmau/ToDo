@@ -1,4 +1,4 @@
-package com.pppp.todo.main.todo
+package com.pppp.todo.main.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
