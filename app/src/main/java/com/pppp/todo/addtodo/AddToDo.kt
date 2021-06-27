@@ -1,9 +1,15 @@
 package com.pppp.todo.main.view
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +34,31 @@ import com.pppp.todo.toDueDateText
 import com.pppp.todo.toEpochMillis
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun BottomSheet(
+    modalBottomSheetState: ModalBottomSheetState,
+    onEvent: (ToDoViewEvent) -> Unit
+) {
+    ModalBottomSheetLayout(
+        sheetState = modalBottomSheetState,
+        sheetContent = {
+            AddToDo(onEvent)
+        },
+        sheetShape = RoundedCornerShape(4.dp),
+        content = {}
+    )
+    val coroutineScope = rememberCoroutineScope()
+    BackHandler(modalBottomSheetState) {
+        coroutineScope.launch {
+           onEvent(OnAddToDoClicked)
+        }
+    }
+}
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -134,6 +166,28 @@ private fun DoneButton(onDone: () -> Unit) {
 @Preview
 @Composable
 fun previewAddToDo() {
-    AddToDo()
+    AddToDo {}
 }
 
+@ExperimentalMaterialApi
+@Composable
+public fun BackHandler(modalBottomSheetState: ModalBottomSheetState, onBack: () -> Job) {
+    val currentOnBack by rememberUpdatedState(onBack)
+    val backCallback = remember {
+        object : OnBackPressedCallback(modalBottomSheetState.isVisible) {
+            override fun handleOnBackPressed() {
+                currentOnBack()
+            }
+        }
+    }
+    backCallback.isEnabled = modalBottomSheetState.isVisible
+    val backDispatcher =
+        requireNotNull(LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, backDispatcher, modalBottomSheetState.isVisible) {
+        backDispatcher.addCallback(lifecycleOwner, backCallback)
+        onDispose {
+            backCallback.remove()
+        }
+    }
+}

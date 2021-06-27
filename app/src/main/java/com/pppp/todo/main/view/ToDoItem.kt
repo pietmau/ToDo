@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.*
@@ -14,24 +15,27 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pppp.todo.main.ToDoViewEvent
+import com.pppp.todo.main.ToDoViewEvent.OnEditToDoClicked
 import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
 import com.pppp.todo.main.ToDoViewModel
 import com.pppp.todo.toDueDateText
 
 @Composable
 fun ToDoItem(
-    toDo: ToDoViewModel,
-    onEvent: (ToDoViewEvent) -> Unit
+    toDo: ToDoViewModel = ToDoViewModel(id = "", title = "Title"),
+    onEvent: (ToDoViewEvent) -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.padding(
-            PaddingValues(
-                start = 4.dp,
-                end = 4.dp,
-                top = 4.dp,
-                bottom = 0.dp
+        modifier = Modifier
+            .padding(
+                PaddingValues(
+                    start = 4.dp,
+                    end = 4.dp,
+                    top = 4.dp,
+                    bottom = 0.dp
+                )
             )
-        ),
+            .clickable { onEvent(OnEditToDoClicked(toDo.id)) },
         elevation = 4.dp,
         shape = MaterialTheme.shapes.medium.copy(
             topStart = CornerSize(4.dp)
@@ -41,6 +45,7 @@ fun ToDoItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(8.dp)
+                .height(56.dp)
                 .fillMaxWidth(),
         ) {
             ToDoCheckBox(toDo, onEvent)
@@ -52,15 +57,25 @@ fun ToDoItem(
             Spacer(modifier = Modifier.width(8.dp))
             Due(toDo)
             Spacer(modifier = Modifier.width(8.dp))
-            Star(Modifier, toDo)
         }
     }
 }
 
 @Composable
 fun Due(toDo: ToDoViewModel) {
-    toDo.due?.let {
-        Text(text = it.toDueDateText())
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            modifier = Modifier.size(16.dp),
+            imageVector = Icons.Outlined.DateRange,
+            contentDescription = ""
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        toDo.due?.let {
+            Text(
+                text = it.toDueDateText(),
+                style = MaterialTheme.typography.caption
+            )
+        }
     }
 }
 

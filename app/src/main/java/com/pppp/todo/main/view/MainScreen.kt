@@ -1,5 +1,6 @@
 package com.pppp.todo.main.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -31,8 +32,9 @@ fun MainScreen(viewModel: MainViewModel) {
 @ExperimentalMaterialApi
 @Composable
 private fun MainScreenImpl(state: TodoMainViewModel1, onEvent: (ToDoViewEvent) -> Unit) {
-    var modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(Hidden)
+    val modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(Hidden)
     LaunchedEffect(state.isAddTodoShowing) {
+        Log.e("foo", "state.isAddTodoShowin " + state.isAddTodoShowing)
         if (state.isAddTodoShowing) {
             modalBottomSheetState.show()
         } else {
@@ -53,17 +55,10 @@ private fun MainScreenImpl(state: TodoMainViewModel1, onEvent: (ToDoViewEvent) -
         ) {
             Content(state, onEvent)
         }
-
-        ModalBottomSheetLayout(
-            sheetState = modalBottomSheetState,
-            sheetContent = {
-                AddToDo(onEvent)
-            },
-            sheetShape = RoundedCornerShape(4.dp),
-            content = {}
-        )
+        BottomSheet(modalBottomSheetState, onEvent)
     }
 }
+
 
 @Composable
 fun Fab(onClick: () -> Unit) {

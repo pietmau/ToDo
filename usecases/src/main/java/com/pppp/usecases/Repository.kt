@@ -1,14 +1,20 @@
 package com.pppp.usecases
 
 import  com.pppp.entities.ToDo
-import com.pppp.usecases.addtodo.AddToDoUseCase
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
 
-    suspend fun getToDos(): Flow<List<ToDo>>
+    suspend fun getToDo(): Flow<List<ToDo>>
 
-    suspend fun addToDo(params: AddToDoUseCase.Params): String
+    suspend fun addToDo(params: Params.Add): String
 
-    fun edit(id: String, values: Map<String, Any?>)
+    suspend fun edit(id: String, values: Map<String, Any?>): String
+
+    fun getToDo(id: String): Flow<List<ToDo>>
+
+    sealed class Params {
+        data class Add(val title: String, val due: Long? = null)
+    }
+
 }

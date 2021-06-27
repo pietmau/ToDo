@@ -1,21 +1,13 @@
 package com.pppp.database
 
 import com.google.firebase.firestore.*
-import com.pppp.database.FirebaseRepository.Companion.COMPLETED
-import com.pppp.database.FirebaseRepository.Companion.CREATED
-import com.pppp.database.FirebaseRepository.Companion.DUE
-import com.pppp.database.FirebaseRepository.Companion.EMPTY_STRING
-import com.pppp.database.FirebaseRepository.Companion.STARRED
-import com.pppp.database.FirebaseRepository.Companion.TITLE
 import com.pppp.entities.ToDo
 import com.pppp.usecases.Repository
-import com.pppp.usecases.addtodo.AddToDoUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -24,10 +16,10 @@ class FirebaseRepository(
 ) : Repository {
 
     @ExperimentalCoroutinesApi
-    override suspend fun getToDos(): Flow<List<ToDo>> =
+    override suspend fun getToDo(): Flow<List<ToDo>> =
         callbackFlow {
-            val registration: ListenerRegistration =
-                db.collection(TODOS).addSnapshotListener { value, error ->
+            val registration = db.collection(TODOS)
+                .addSnapshotListener { value, error ->
                     if (error != null) {
                         cancel(
                             message = "error fetching collection data",
@@ -43,7 +35,15 @@ class FirebaseRepository(
             }
         }
 
-    override suspend fun addToDo(params: AddToDoUseCase.Params): String =
+    override fun getToDo(id: String): Flow<List<ToDo>> =
+        callbackFlow {
+            db.collection(TODOS).document(id).get()
+                .addOnSuccessListener { value: DocumentSnapshot ->
+                    trySend(listOfNotNull(value?.toToDo()))
+                }
+        }
+
+    override suspend fun addToDo(params: Repository.Params.Add): String =
         suspendCoroutine { continuation ->
             db.collection(TODOS).add(
                 ToDo(
@@ -59,9 +59,12 @@ class FirebaseRepository(
             }
         }
 
-    override fun edit(id: String, values: Map<String, Any?>) {
-        db.collection(TODOS).document(id).update(values)
-    }
+    override suspend fun edit(id: String, values: Map<String, Any?>): String =
+        suspendCoroutine { continuation ->
+            db.collection(TODOS).document(id).update(values).addOnSuccessListener {
+                continuation.resume(id)
+            }
+        }
 
     companion object {
         const val ID = "id"
@@ -75,14 +78,3 @@ class FirebaseRepository(
     }
 }
 
-private fun QuerySnapshot?.toToDoList(): List<ToDo> =
-    this?.documents?.map { it.toToDo() }?.sortedBy { it.due } ?: emptyList()
-
-private fun DocumentSnapshot.toToDo() = ToDo(
-    id = this.id,
-    title = this.get(TITLE, String::class.java) ?: EMPTY_STRING,
-    starred = this.getBoolean(STARRED) ?: false,
-    created = this.get(CREATED, Long::class.java),
-    completed = this.getBoolean(COMPLETED),
-    due = this.get(DUE, Long::class.java),
-)

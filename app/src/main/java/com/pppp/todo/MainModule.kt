@@ -9,12 +9,10 @@ import com.pppp.entities.ToDo
 import com.pppp.todo.main.TodoMainViewModel
 import com.pppp.todo.main.mapper.Mapper
 import com.pppp.todo.notification.WorkManagerNotificationScheduler
-import com.pppp.usecases.EditToDoUseCase
+import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.Repository
-import com.pppp.usecases.addtodo.AddToDoUseCase
 import com.pppp.usecases.notification.NotificationScheduler
-import com.pppp.usecases.notification.NotificationUseCase
-import com.pppp.usecases.todolist.ToDoListUseCase
+import com.pppp.usecases.todolist.GetToDoUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -37,17 +35,13 @@ abstract class MainModule {
         fun provideRepository(): Repository = FirebaseRepository(Firebase.firestore)
 
         @Provides
-        fun toDoListUseCase(repository: Repository): ToDoListUseCase = ToDoListUseCase(repository)
+        fun toDoListUseCase(repository: Repository): GetToDoUseCase = GetToDoUseCase(repository)
 
         @Provides
-        fun addToDoUseCase(repository: Repository): AddToDoUseCase = AddToDoUseCase(repository)
-
-        @Provides
-        fun editToDoUseCase(repository: Repository): EditToDoUseCase = EditToDoUseCase(repository)
-
-        @Provides
-        fun notificationUseCase(notificationScheduler: NotificationScheduler): NotificationUseCase =
-            NotificationUseCase(notificationScheduler)
+        fun editToDoUseCase(
+            repository: Repository,
+            notificationScheduler: NotificationScheduler
+        ): EditTodoUseCase = EditTodoUseCase(repository, notificationScheduler)
 
         @Provides
         fun workManager(@ApplicationContext context: Context): WorkManager =
