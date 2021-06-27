@@ -45,7 +45,7 @@ fun ToDoItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(8.dp)
-                .height(56.dp)
+                .height(48.dp)
                 .fillMaxWidth(),
         ) {
             ToDoCheckBox(toDo, onEvent)
@@ -63,6 +63,7 @@ fun ToDoItem(
 
 @Composable
 fun Due(toDo: ToDoViewModel) {
+    toDo.due ?: return
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             modifier = Modifier.size(16.dp),
@@ -70,12 +71,10 @@ fun Due(toDo: ToDoViewModel) {
             contentDescription = ""
         )
         Spacer(modifier = Modifier.width(2.dp))
-        toDo.due?.let {
-            Text(
-                text = it.toDueDateText(),
-                style = MaterialTheme.typography.caption
-            )
-        }
+        Text(
+            text = "Due ${toDo.due.toDueDateText()}", //TODO
+            style = MaterialTheme.typography.caption
+        )
     }
 }
 

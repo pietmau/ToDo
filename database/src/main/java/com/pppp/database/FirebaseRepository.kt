@@ -35,12 +35,16 @@ class FirebaseRepository(
             }
         }
 
+    @ExperimentalCoroutinesApi
     override fun getToDo(id: String): Flow<List<ToDo>> =
         callbackFlow {
             db.collection(TODOS).document(id).get()
                 .addOnSuccessListener { value: DocumentSnapshot ->
-                    trySend(listOfNotNull(value?.toToDo()))
+                    trySend(listOfNotNull(value.toToDo()))
                 }
+            awaitClose {
+                /* NoOp */
+            }
         }
 
     override suspend fun addToDo(params: Repository.Params.Add): String =

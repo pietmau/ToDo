@@ -1,10 +1,7 @@
 package com.pppp.todo.main.view
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.*
@@ -16,7 +13,7 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainViewModel
 import com.pppp.todo.main.ToDoViewEvent
 import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.TodoMainViewModel as TodoMainViewModel1
+import com.pppp.todo.main.TodoMainViewModel as TodoMainViewModel
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -24,23 +21,14 @@ import com.pppp.todo.main.TodoMainViewModel as TodoMainViewModel1
 fun MainScreen(viewModel: MainViewModel) {
     val state by viewModel.uiState.collectAsState()
     MainScreenImpl(state) {
-        viewModel(it)
+        viewModel.invoke(it)
     }
 }
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-private fun MainScreenImpl(state: TodoMainViewModel1, onEvent: (ToDoViewEvent) -> Unit) {
-    val modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(Hidden)
-    LaunchedEffect(state.isAddTodoShowing) {
-        Log.e("foo", "state.isAddTodoShowin " + state.isAddTodoShowing)
-        if (state.isAddTodoShowing) {
-            modalBottomSheetState.show()
-        } else {
-            modalBottomSheetState.hide()
-        }
-    }
+private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (ToDoViewEvent) -> Unit) {
     Box {
         Scaffold(
             floatingActionButton = {
@@ -53,9 +41,10 @@ private fun MainScreenImpl(state: TodoMainViewModel1, onEvent: (ToDoViewEvent) -
                 BottomAppBar {}
             }
         ) {
-            Content(state, onEvent)
+            Content(mainViewModel, onEvent)
         }
-        BottomSheet(modalBottomSheetState, onEvent)
+        AddBottomSheet(mainViewModel, onEvent)
+        EditBottomSheet(mainViewModel, onEvent)
     }
 }
 
@@ -71,7 +60,7 @@ fun Fab(onClick: () -> Unit) {
 
 @Composable
 private fun Content(
-    state: TodoMainViewModel1,
+    state: TodoMainViewModel,
     onEvent: (ToDoViewEvent) -> Unit = { _ -> }
 ) {
     when (state.isLoading) {
