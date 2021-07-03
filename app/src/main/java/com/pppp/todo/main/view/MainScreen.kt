@@ -9,16 +9,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
-import com.pppp.todo.main.MainViewModel
-import com.pppp.todo.main.ToDoViewEvent
-import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.TodoMainViewModel as TodoMainViewModel
+import com.pppp.todo.main.viewmodel.MainViewModel
+import com.pppp.todo.main.viewmodel.MainViewEvent
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen() {
+    val navController = rememberNavController()
+    val viewModel: MainViewModel = viewModel()
     val state by viewModel.uiState.collectAsState()
     MainScreenImpl(state) {
         viewModel.invoke(it)
@@ -28,7 +33,7 @@ fun MainScreen(viewModel: MainViewModel) {
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (ToDoViewEvent) -> Unit) {
+private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (MainViewEvent) -> Unit) {
     Box {
         Scaffold(
             floatingActionButton = {
@@ -44,7 +49,7 @@ private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (ToDoViewE
             Content(mainViewModel, onEvent)
         }
         AddBottomSheet(mainViewModel, onEvent)
-        EditBottomSheet(mainViewModel, onEvent)
+        EditBottomSheet(mainViewModel.toDoBeingEdited, onEvent)
     }
 }
 
@@ -61,7 +66,7 @@ fun Fab(onClick: () -> Unit) {
 @Composable
 private fun Content(
     state: TodoMainViewModel,
-    onEvent: (ToDoViewEvent) -> Unit = { _ -> }
+    onEvent: (MainViewEvent) -> Unit = { _ -> }
 ) {
     when (state.isLoading) {
         true -> ListOfToDos(state, onEvent)

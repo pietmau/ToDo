@@ -14,16 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pppp.todo.main.ToDoViewEvent
-import com.pppp.todo.main.ToDoViewEvent.OnEditToDoClicked
-import com.pppp.todo.main.ToDoViewEvent.OnToDoCompleted
-import com.pppp.todo.main.ToDoViewModel
+import com.pppp.todo.main.viewmodel.MainViewEvent
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
+import com.pppp.todo.main.viewmodel.ToDoViewModel
 import com.pppp.todo.toDueDateText
 
 @Composable
 fun ToDoItem(
     toDo: ToDoViewModel = ToDoViewModel(id = "", title = "Title"),
-    onEvent: (ToDoViewEvent) -> Unit = {}
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -107,7 +107,7 @@ private fun ToDoViewModel.getStarImage() =
     }
 
 @Composable
-private fun ToDoCheckBox(toDo: ToDoViewModel, onEvent: (ToDoViewEvent) -> Unit) {
+private fun ToDoCheckBox(toDo: ToDoViewModel, onEvent: (MainViewEvent) -> Unit) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {
         isChecked = it

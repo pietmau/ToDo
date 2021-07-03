@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.pppp.todo.main.ToDoViewEvent
-import com.pppp.todo.main.TodoMainViewModel
+import com.pppp.todo.main.viewmodel.MainViewEvent
+import com.pppp.todo.main.viewmodel.MainViewState
 
 @Composable
 fun ListOfToDos(
-    mainViewModel: TodoMainViewModel,
-    onEvent: (ToDoViewEvent) -> Unit = { _ -> }
+    mainViewState: MainViewState,
+    onEvent: (MainViewEvent) -> Unit = { _ -> }
 ) {
     LazyColumn(
         Modifier
@@ -21,7 +21,7 @@ fun ListOfToDos(
             .padding(0.dp, 0.dp, 0.dp, 56.dp)
     ) {
         itemsIndexed(
-            items = mainViewModel.todos,
+            items = mainViewState.todos,
             key = { index, item -> item.id }
         ) { index, item ->
             ToDoItem(

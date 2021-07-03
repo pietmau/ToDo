@@ -1,15 +1,14 @@
 package com.pppp.todo.main.mapper
 
 import com.pppp.entities.ToDo
-import com.pppp.todo.main.ToDoViewModel
-import com.pppp.todo.main.TodoMainViewModel
+import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.toDoViewModel
 import javax.inject.Inject
 
-class Mapper @Inject constructor() : @JvmSuppressWildcards (List<ToDo>) -> TodoMainViewModel {
+class Mapper @Inject constructor() : @JvmSuppressWildcards (List<ToDo>) -> MainViewState {
 
-    override fun invoke(result: List<ToDo>): TodoMainViewModel =
-        TodoMainViewModel(todos = result.map {
+    override fun invoke(result: List<ToDo>): MainViewState =
+        MainViewState(todos = result.map {
             it.toDoViewModel()
         })
 

@@ -22,14 +22,14 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pppp.todo.BottomSheet
 import com.pppp.todo.addtodo.AddTodoViewState
-import com.pppp.todo.main.ToDoViewEvent
-import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
-import com.pppp.todo.main.TodoMainViewModel
+import com.pppp.todo.main.viewmodel.MainViewEvent
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
+import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.toDueDateText
 import com.pppp.todo.toEpochMillis
+import com.pppp.uielements.BottomSheet
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 
@@ -37,10 +37,13 @@ import com.vanpra.composematerialdialogs.datetime.datetimepicker
 @ExperimentalMaterialApi
 @Composable
 fun AddBottomSheet(
-    mainViewModel: TodoMainViewModel = TodoMainViewModel(),
-    onEvent: (ToDoViewEvent) -> Unit = {}
+    mainViewState: MainViewState = MainViewState(),
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
-    BottomSheet(mainViewModel.isAddTodoShowing) {
+    BottomSheet(
+        shouldShow = mainViewState.isAddTodoShowing,
+        onBackPressed = { onEvent(MainViewEvent.OnCancel) })
+    {
         AddToDo(onEvent)
     }
 }
@@ -49,7 +52,7 @@ fun AddBottomSheet(
 @ExperimentalMaterialApi
 @Composable
 fun AddToDo(
-    onEvent: (ToDoViewEvent) -> Unit = {}
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
     Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)) {
         AddToDoInputControl(onEvent)
@@ -58,7 +61,7 @@ fun AddToDo(
 
 @ExperimentalComposeUiApi
 @Composable
-fun AddToDoInputControl(onEvent: (ToDoViewEvent) -> Unit = {}) {
+fun AddToDoInputControl(onEvent: (MainViewEvent) -> Unit = {}) {
     val state = rememberSaveable { mutableStateOf(AddTodoViewState()) }
 
     Column {
@@ -66,10 +69,10 @@ fun AddToDoInputControl(onEvent: (ToDoViewEvent) -> Unit = {}) {
             val keyboardController = LocalSoftwareKeyboardController.current
 
             val onDone = {
-                keyboardController?.hide()
-                if (state.value.text.isEmpty()) {
+                if (state.value.text.isNullOrBlank()) {
                     state.value = state.value.copy(isError = true)
                 } else {
+                    keyboardController?.hide()
                     onEvent(OnAddToDoClicked)
                     onEvent(OnToDoAdded(state.value.text, state.value.dueDate))
                     state.value = state.value.copy(text = "")

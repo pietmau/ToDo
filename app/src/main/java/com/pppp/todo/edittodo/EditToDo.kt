@@ -1,69 +1,105 @@
-package com.pppp.todo.main.view
+package com.pppp.todo.edittodo
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pppp.todo.BottomSheet
-import com.pppp.todo.addtodo.AddTodoViewState
-import com.pppp.todo.main.ToDoViewEvent
-import com.pppp.todo.main.ToDoViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.ToDoViewEvent.OnToDoAdded
-import com.pppp.todo.main.TodoMainViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.R
+import com.pppp.todo.main.viewmodel.MainViewEvent
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
+import com.pppp.todo.main.viewmodel.ToDoViewModel
+import com.pppp.uielements.BottomSheet
+import com.pppp.uielements.ClosableErrorTextField
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun EditBottomSheet(
-    mainViewModel: TodoMainViewModel = TodoMainViewModel(),
-    onEvent: (ToDoViewEvent) -> Unit = {}
+    toDoToBeEdited: ToDoViewModel? = null,
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
-    BottomSheet(mainViewModel.toDoBeingEdited != null) {
-        Column(
-            modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = 8.dp
-            )
-        ) {
-            val state = rememberSaveable { mutableStateOf(AddTodoViewState()) }
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val keyboardController = LocalSoftwareKeyboardController.current
+    val editViewModel = viewModel<EditViewModel>().apply {
+        invoke(
+            EditTodoViewEvent.Init(toDoToBeEdited)
+        )
+    }
+    val state = editViewModel.uiState.collectAsState()
+    BottomSheet(
+        shouldShow = toDoToBeEdited != null,
+        onBackPressed = {
+            onEvent(OnCancel)
+        }) {
+        Content(
+            state = state.value,
+            onCancel = {
+                onEvent(OnCancel)
+            }
+        )
+    }
+}
 
-                    val onDone = {
-                        keyboardController?.hide()
-                        if (state.value.text.isEmpty()) {
-                            state.value = state.value.copy(isError = true)
-                        } else {
-                            onEvent(OnAddToDoClicked)
-                            onEvent(OnToDoAdded(state.value.text, state.value.dueDate))
-                            state.value = state.value.copy(text = "")
-                        }
-                    }
-                    TextField(
-                        modifier = Modifier.weight(1F),
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { onDone() }),
-                        value = state.value.text,
-                        onValueChange = {
-                            state.value = state.value.copy(text = it, isError = false)
-                        },
-                        isError = state.value.isError
-                    )
-                }
+@ExperimentalComposeUiApi
+@Composable
+fun Content(
+    state: EditTodoViewState = EditTodoViewState(),
+    onDone: () -> Unit = {},
+    onCancel: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.padding(
+            start = 16.dp,
+            end = 16.dp,
+            top = 16.dp,
+            bottom = 8.dp
+        )
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ClosableErrorTextField(
+                    modifier = Modifier.weight(1F),
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    onDone = { onDone() },
+                    value = state.text,
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                modifier = Modifier.padding(end = 8.dp, top = 8.dp),
+                onClick = {
+                    onCancel()
+                }) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+            Button(
+                modifier = Modifier.padding(top = 8.dp),
+                onClick = {}) {
+                Text(text = stringResource(id = R.string.save))
             }
         }
     }
 }
+
+@Composable
+@Preview
+@ExperimentalComposeUiApi
+private fun ContentPtreview(onEvent: (MainViewEvent) -> Unit = {}) {
+    Content()
+}
+
+
+
+

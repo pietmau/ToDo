@@ -6,7 +6,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pppp.database.FirebaseRepository
 import com.pppp.entities.ToDo
-import com.pppp.todo.main.TodoMainViewModel
+import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.main.mapper.Mapper
 import com.pppp.todo.notification.WorkManagerNotificationScheduler
 import com.pppp.usecases.EditTodoUseCase
@@ -29,7 +29,7 @@ abstract class MainModule {
 
     companion object {
         @Provides
-        fun bindsMapper(): @JvmSuppressWildcards (List<ToDo>) -> TodoMainViewModel = Mapper()
+        fun bindsMapper(): @JvmSuppressWildcards (List<ToDo>) -> MainViewState = Mapper()
 
         @Provides
         fun provideRepository(): Repository = FirebaseRepository(Firebase.firestore)

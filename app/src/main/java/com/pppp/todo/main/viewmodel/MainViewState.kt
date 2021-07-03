@@ -1,6 +1,6 @@
-package com.pppp.todo.main
+package com.pppp.todo.main.viewmodel
 
-data class TodoMainViewModel(
+data class MainViewState(
     val isLoading: Boolean = true,
     val todos: List<ToDoViewModel> = emptyList(),
     val error: ErrorMessage? = null,

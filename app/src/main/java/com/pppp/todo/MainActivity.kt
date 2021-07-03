@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,7 +11,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.tooling.preview.Preview
-import com.pppp.todo.main.MainViewModel
 import com.pppp.todo.main.view.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,11 +24,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        val viewModel: MainViewModel by viewModels()
         setContent {
             ToDoTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    MainScreen(viewModel)
+                    MainScreen()
                 }
             }
         }

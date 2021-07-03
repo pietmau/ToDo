@@ -1,4 +1,4 @@
-package com.pppp.todo
+package com.pppp.uielements
 
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
@@ -17,6 +16,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun BottomSheet(
     shouldShow: Boolean = false,
+    onBackPressed: () -> Unit = {},
     content: @Composable() (ColumnScope.() -> Unit) = {}
 ) {
     val modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
@@ -38,7 +38,7 @@ fun BottomSheet(
     val coroutineScope = rememberCoroutineScope()
     BackHandler(modalBottomSheetState.isVisible) {
         coroutineScope.launch {
-            modalBottomSheetState.hide()
+            onBackPressed()
         }
     }
 }
