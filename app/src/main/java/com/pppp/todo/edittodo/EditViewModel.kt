@@ -3,6 +3,7 @@ package com.pppp.todo.edittodo
 import com.pppp.todo.GenericViewModel
 import com.pppp.todo.main.viewmodel.ToDoViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
@@ -10,12 +11,13 @@ import javax.inject.Inject
 class EditViewModel @Inject constructor() :
     GenericViewModel<EditTodoViewState, EditTodoViewEvent>() {
 
-    override val _uiState = MutableStateFlow(EditTodoViewState())
+    override val _uiStates = MutableStateFlow(EditTodoViewState())
 
     override fun invoke(event: EditTodoViewEvent) =
         when (event) {
-            is EditTodoViewEvent.Init -> event.toDoToBeEdited?.let { emit(it.toViewState()) }
+            is EditTodoViewEvent.Init -> event.toDoToBeEdited?.let { emitViewState(it.toViewState()) }
         }
+
 }
 
 data class EditTodoViewState(
@@ -27,6 +29,7 @@ data class EditTodoViewState(
 sealed class EditTodoViewEvent {
     data class Init(val toDoToBeEdited: ToDoViewModel?) : EditTodoViewEvent()
 }
+
 
 private fun ToDoViewModel.toViewState(): EditTodoViewState =
     EditTodoViewState(

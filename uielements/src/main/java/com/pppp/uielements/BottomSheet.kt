@@ -1,13 +1,13 @@
 package com.pppp.uielements
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -15,20 +15,10 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterialApi
 @Composable
 fun BottomSheet(
-    shouldShow: Boolean = false,
+    modalBottomSheetState: ModalBottomSheetState,
     onBackPressed: () -> Unit = {},
     content: @Composable() (ColumnScope.() -> Unit) = {}
 ) {
-    val modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        ModalBottomSheetValue.Hidden
-    )
-    LaunchedEffect(shouldShow) {
-        if (shouldShow) {
-            modalBottomSheetState.show()
-        } else {
-            modalBottomSheetState.hide()
-        }
-    }
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetContent = content,
@@ -36,32 +26,14 @@ fun BottomSheet(
         content = {}
     )
     val coroutineScope = rememberCoroutineScope()
-    BackHandler(modalBottomSheetState.isVisible) {
+    Log.e(
+        "foo",
+        "modalBottomSheetState " + modalBottomSheetState.currentValue
+    )
+    BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
         coroutineScope.launch {
+            Log.e("foo", "BottomSheet onBackPressed")
             onBackPressed()
-        }
-    }
-}
-
-@ExperimentalMaterialApi
-@Composable
-fun BackHandler(isVisible: Boolean = false, onBack: () -> Unit = {}) {
-    val currentOnBack by rememberUpdatedState(onBack)
-    val backCallback = remember {
-        object : OnBackPressedCallback(isVisible) {
-            override fun handleOnBackPressed() {
-                currentOnBack()
-            }
-        }
-    }
-    backCallback.isEnabled = isVisible
-    val backDispatcher =
-        requireNotNull(LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher)
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, backDispatcher, isVisible) {
-        backDispatcher.addCallback(lifecycleOwner, backCallback)
-        onDispose {
-            backCallback.remove()
         }
     }
 }

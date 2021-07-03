@@ -6,7 +6,7 @@ sealed class MainViewEvent {
 
     object OnAddToDoClicked : MainViewEvent()
 
-    data class OnToDoAdded(val text: String, val due: Long? = null) : MainViewEvent()
+    data class OnToDoAdded(val title: String, val due: Long? = null) : MainViewEvent()
 
     data class OnToDoCompleted(val id: String, val completed: Boolean) : MainViewEvent()
 

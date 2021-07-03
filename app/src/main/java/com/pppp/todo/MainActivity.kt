@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pppp.todo.main.view.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.flow
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -23,10 +24,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
         setContent {
+            fooLog("setContent")
             ToDoTheme {
+                fooLog("ToDoTheme")
                 Surface(color = MaterialTheme.colors.background) {
+                    fooLog("Surface")
                     MainScreen()
                 }
             }

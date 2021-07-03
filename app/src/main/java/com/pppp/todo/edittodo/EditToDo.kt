@@ -31,19 +31,23 @@ fun EditBottomSheet(
             EditTodoViewEvent.Init(toDoToBeEdited)
         )
     }
-    val state = editViewModel.uiState.collectAsState()
+    val state = editViewModel.states.collectAsState()
     BottomSheet(
-        shouldShow = toDoToBeEdited != null,
         onBackPressed = {
             onEvent(OnCancel)
-        }) {
-        Content(
-            state = state.value,
-            onCancel = {
-                onEvent(OnCancel)
-            }
+        },
+        content = {
+            Content(
+                state = state.value,
+                onCancel = {
+                    onEvent(OnCancel)
+                }
+            )
+        },
+        modalBottomSheetState = rememberModalBottomSheetState(
+            ModalBottomSheetValue.Hidden
         )
-    }
+    )
 }
 
 @ExperimentalComposeUiApi

@@ -1,5 +1,6 @@
 package com.pppp.todo
 
+import android.util.Log
 import com.pppp.entities.ToDo
 import com.pppp.todo.main.viewmodel.ToDoViewModel
 import java.text.SimpleDateFormat
@@ -28,3 +29,9 @@ fun ToDo.toDoViewModel() = ToDoViewModel(
     starred = starred,
     due = due
 )
+
+fun fooLog(text: String, tag: String = "foo") {
+    if (BuildConfig.DEBUG) {
+        Log.e(tag, text)
+    }
+}
