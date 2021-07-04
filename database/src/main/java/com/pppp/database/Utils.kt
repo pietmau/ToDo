@@ -5,7 +5,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.pppp.entities.ToDo
 
 fun QuerySnapshot?.toToDoList(): List<ToDo> =
-    this?.documents?.map { it.toToDo() }?.sortedBy { it.due } ?: emptyList()
+    this?.documents?.map { it.toToDo() }?.sortedWith(ToDoComparator) ?: emptyList()
 
 fun DocumentSnapshot.toToDo() = ToDo(
     id = this.id,
@@ -16,3 +16,18 @@ fun DocumentSnapshot.toToDo() = ToDo(
     completed = this.getBoolean(FirebaseRepository.COMPLETED),
     due = this.get(FirebaseRepository.DUE, Long::class.java),
 )
+
+private object ToDoComparator : Comparator<ToDo> {
+    override fun compare(o1: ToDo, o2: ToDo): Int {
+        if (o1.due == null && o2.due != null) {
+            return 1
+        }
+        if (o1.due != null && o2.due == null) {
+            return -1
+        }
+        if (o1.due == null && o2.due == null) {
+            return 1
+        }
+        return o1.due!!.compareTo(o2.due!!)
+    }
+}

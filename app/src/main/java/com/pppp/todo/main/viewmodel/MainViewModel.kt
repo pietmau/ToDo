@@ -60,7 +60,6 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onAddToDoClicked() = launch {
-        fooLog("onAddToDoClicked", this::class.simpleName!!)
         emitOneOffEvent(OneOffEvent.OpenAddToDoModal)
     }
 
