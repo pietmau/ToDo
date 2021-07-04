@@ -18,6 +18,8 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
+import com.pppp.todo.main.viewmodel.OneOffEvent
+import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
 import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -36,9 +38,10 @@ fun MainScreen() {
     )
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            viewModel.navigationEvents.collect {
+            viewModel.oneOffEvents.collect {
                 when (it) {
                     OpenAddToDoModal -> modalBottomSheetState.show()
+                    CloseAddToDoModal -> modalBottomSheetState.hide()
                 }.exaustive
             }
         }

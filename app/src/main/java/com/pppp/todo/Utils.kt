@@ -1,6 +1,5 @@
 package com.pppp.todo
 
-import android.util.Log
 import com.pppp.entities.ToDo
 import com.pppp.todo.main.viewmodel.ToDoViewModel
 import java.text.SimpleDateFormat
@@ -18,7 +17,7 @@ interface Consumer<T> {
 fun Long.toDueDateText() =
     SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(this))
 
-fun LocalDateTime.toEpochMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+fun LocalDateTime.toMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 fun Long.toDueDateNotificationText() =
     SimpleDateFormat("EEE, dd MMMM HH:mm", Locale.getDefault()).format(Date(this))
@@ -29,3 +28,6 @@ fun ToDo.toDoViewModel() = ToDoViewModel(
     starred = starred,
     due = due
 )
+
+fun Long.calculateDelay() = this - LocalDateTime.now().toMillis()
+

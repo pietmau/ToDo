@@ -1,43 +1,56 @@
 package com.pppp.todo.notification
 
-import androidx.work.*
-import com.pppp.todo.toEpochMillis
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy.REPLACE
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.pppp.todo.calculateDelay
 import com.pppp.usecases.notification.NotificationScheduler
-import com.pppp.usecases.notification.NotificationScheduler.Params
-import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class WorkManagerNotificationScheduler @Inject constructor(private val workManager: WorkManager) :
     NotificationScheduler {
 
-    override fun schedule(params: Params) {
-        val delay = calculateDelay(params.timeInMills)
-        if (delay < 0) {
+    override fun trySchedule(id: String, text: String?, timeInMills: Long?) {
+        removeScheduledIfAny(id)
+        timeInMills ?: return
+        text ?: return
+        scheduleInternal(timeInMills.calculateDelay(), id, text, timeInMills)
+    }
+
+    override fun trySchedule(id: String, values: Map<String, Any?>) =
+        trySchedule(id, values[TITLE] as? String?, values[DUE] as? Long?)
+
+    private fun scheduleInternal(
+        delay: Long,
+        id: String,
+        text: String?,
+        timeInMills: Long
+    ) {
+        if (delay <= 0) {
             return
         }
-        workManager.enqueue(
-            OneTimeWorkRequestBuilder<OneTimeScheduleWorker>()
+        workManager.enqueueUniqueWork(
+            id, REPLACE, OneTimeWorkRequestBuilder<OneTimeScheduleWorker>()
                 .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                 .setInputData(
                     Data.Builder()
-                        .putString(TEXT, params.text)
-                        .putString(ID, params.id)
-                        .putLong(TIME_DUE, params.timeInMills)
+                        .putString(TITLE, text)
+                        .putString(ID, id)
+                        .putLong(DUE, timeInMills)
                         .build()
                 )
-                .addTag(params.id)
                 .build()
         )
     }
 
-    private fun calculateDelay(timeInMills: Long) =
-        timeInMills - LocalDateTime.now().toEpochMillis()
+    private fun removeScheduledIfAny(id: String?) = id?.let { workManager.cancelUniqueWork(id) }
 
-    internal companion object {
-        internal const val TEXT = "text"
-        internal const val ID = "id"
-        internal const val TIME_DUE = "time_due"
+    companion object {
+        const val ID = "id"
+        const val DUE = "due"
+        const val TITLE = "due"
     }
 }
 

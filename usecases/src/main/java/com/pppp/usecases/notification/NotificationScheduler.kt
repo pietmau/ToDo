@@ -2,11 +2,8 @@ package com.pppp.usecases.notification
 
 interface NotificationScheduler {
 
-    fun schedule(params: Params)
+    fun trySchedule(id: String, text: String?, timeInMills: Long?)
 
-    data class Params(
-        val text: String,
-        val timeInMills: Long,
-        val id: String
-    )
+    fun trySchedule(id: String, values: Map<String, Any?>)
+
 }

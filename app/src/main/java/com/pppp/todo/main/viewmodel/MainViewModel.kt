@@ -1,10 +1,12 @@
 package com.pppp.todo.main.viewmodel
 
+import com.pppp.database.FirebaseRepository.Companion.COMPLETED
 import com.pppp.entities.ToDo
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.main.viewmodel.MainViewEvent.*
+import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
+import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import com.pppp.todo.toDoViewModel
-import com.pppp.uielements.fooLog
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
 import com.pppp.usecases.EditTodoUseCase.Params.Edit
@@ -60,17 +62,17 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onAddToDoClicked() = launch {
-        emitOneOffEvent(OneOffEvent.OpenAddToDoModal)
+        emitOneOffEvent(OpenAddToDoModal)
     }
 
     private fun completeToDo(id: String, completed: Boolean) =
         launch {
-            editTodoUseCase(Edit(id, mapOf("completed" to completed)))
+            editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))
         }
 
     private fun addToDo(title: String, due: Long?) =
         launch {
             editTodoUseCase(Add(title = title, due = due))
+            emitOneOffEvent(CloseAddToDoModal)
         }
-
 }

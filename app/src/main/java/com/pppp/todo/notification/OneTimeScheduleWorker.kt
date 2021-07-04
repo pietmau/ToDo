@@ -16,10 +16,10 @@ import androidx.work.WorkerParameters
 import com.pppp.todo.MainActivity
 import com.pppp.todo.MainActivity.Companion.PENDING_INTENT_REQUEST_CODE
 import com.pppp.todo.R
-import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.TEXT
-import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.TIME_DUE
+import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.DUE
+import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.TITLE
 import com.pppp.todo.toDueDateNotificationText
-import com.pppp.todo.toEpochMillis
+import com.pppp.todo.toMillis
 import java.time.LocalDateTime.now
 
 
@@ -38,8 +38,8 @@ class OneTimeScheduleWorker(
                 intent,
                 FLAG_UPDATE_CURRENT
             )
-        val text = workerParams.inputData.getString(TEXT)
-        val title = "TODO at " + workerParams.inputData.getLong(TIME_DUE, now().toEpochMillis()) // TODO
+        val text = workerParams.inputData.getString(TITLE)
+        val title = "TODO at " + workerParams.inputData.getLong(DUE, now().toMillis())
             .toDueDateNotificationText()
         val builder = NotificationCompat.Builder(context)
             .setSmallIcon(R.drawable.ic_baseline_checklist_24)

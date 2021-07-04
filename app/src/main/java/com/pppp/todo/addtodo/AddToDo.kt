@@ -32,7 +32,7 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.todo.toDueDateText
-import com.pppp.todo.toEpochMillis
+import com.pppp.todo.toMillis
 import com.pppp.uielements.BottomSheet
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
@@ -51,7 +51,7 @@ fun AddBottomSheet(
     val scope = rememberCoroutineScope()
     LaunchedEffect(viewmodel) {
         scope.launch {
-            viewmodel.navigationEvents.collect {
+            viewmodel.oneOffEvents.collect {
                 when (it) {
                     is OneOffEvent.AddToDo -> onEvent(OnToDoAdded(title = it.title, due = it.due))
                     is OneOffEvent.OnBackPressed -> onBackPressed()
@@ -138,7 +138,7 @@ private fun Calendar(
     val dialog = remember { MaterialDialog() }
     dialog.build {
         datetimepicker {
-            onEvent(Event.OnTimeDataPicked(it.toEpochMillis()))
+            onEvent(Event.OnTimeDataPicked(it.toMillis()))
         }
     }
     Row(

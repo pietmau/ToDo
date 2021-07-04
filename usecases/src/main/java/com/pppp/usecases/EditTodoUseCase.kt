@@ -3,7 +3,6 @@ package com.pppp.usecases
 import com.pppp.usecases.Repository.Params.Add
 import com.pppp.usecases.notification.NotificationScheduler
 
-
 class EditTodoUseCase(
     private val repository: Repository,
     private val notificationScheduler: NotificationScheduler
@@ -18,19 +17,15 @@ class EditTodoUseCase(
 
     private suspend fun add(title: String, due: Long?): String {
         val id = repository.addToDo(Add(title = title, due = due))
-        due?.run {
-            notificationScheduler.schedule(
-                NotificationScheduler.Params(
-                    text = title,
-                    timeInMills = this,
-                    id = id,
-                )
-            )
-        }
+        notificationScheduler.trySchedule(id, title, due)
         return id
     }
 
-    private suspend fun edit(id: String, values: Map<String, Any?>) = repository.edit(id, values)
+    private suspend fun edit(id: String, values: Map<String, Any?>): String {
+        repository.edit(id, values)
+        notificationScheduler.trySchedule(id, values)
+        return id
+    }
 
     sealed class Params {
         data class Edit(val id: String, val values: Map<String, Any?>) : Params()

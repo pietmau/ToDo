@@ -27,7 +27,10 @@ class AddTodoViewModel @Inject constructor() :
             is OnBackPressed -> onBackPressed()
         }
 
-    private fun onBackPressed() = emitOneOffEvent(OneOffEvent.OnBackPressed)
+    private fun onBackPressed() {
+        clearState()
+        emitOneOffEvent(OneOffEvent.OnBackPressed)
+    }
 
     private fun onTimeDataPicked(due: Long) =
         emitViewState(state.copy(due = due))
@@ -38,9 +41,15 @@ class AddTodoViewModel @Inject constructor() :
     private fun onDoneClicked() =
         when {
             state.title.isBlank() -> emitViewState(state.copy(isError = true))
-            else -> emitOneOffEvent(AddToDo(title = state.title, due = state.due))
+            else -> addTodo()
         }
 
+    private fun addTodo() {
+        emitOneOffEvent(AddToDo(title = state.title, due = state.due))
+        clearState()
+    }
+
+    private fun clearState() = emitViewState(ViewState())
 }
 
 data class ViewState(
