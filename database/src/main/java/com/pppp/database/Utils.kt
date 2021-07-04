@@ -26,7 +26,7 @@ private object ToDoComparator : Comparator<ToDo> {
             return -1
         }
         if (o1.due == null && o2.due == null) {
-            return 1
+            return 0
         }
         return o1.due!!.compareTo(o2.due!!)
     }
