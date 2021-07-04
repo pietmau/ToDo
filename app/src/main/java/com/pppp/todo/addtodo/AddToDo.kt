@@ -38,6 +38,8 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import com.pppp.todo.addtodo.OneOffEvent.AddToDo
+import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -53,8 +55,8 @@ fun AddBottomSheet(
         scope.launch {
             viewmodel.oneOffEvents.collect {
                 when (it) {
-                    is OneOffEvent.AddToDo -> onEvent(OnToDoAdded(title = it.title, due = it.due))
-                    is OneOffEvent.OnBackPressed -> onBackPressed()
+                    is AddToDo -> onEvent(OnToDoAdded(title = it.title, due = it.due))
+                    is OnBackPressed -> onBackPressed()
                 }.exaustive
             }
         }

@@ -15,38 +15,47 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
-import com.pppp.todo.main.viewmodel.ToDoViewModel
 import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.ClosableErrorTextField
+import com.pppp.todo.edittodo.EditTodoViewEvent.Init
+import com.pppp.uielements.fooLog
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun EditBottomSheet(
-    toDoToBeEdited: ToDoViewModel? = null,
+    item: String? = null,
+    modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+        ModalBottomSheetValue.Hidden
+    ),
     onEvent: (MainViewEvent) -> Unit = {}
 ) {
-    val editViewModel = viewModel<EditViewModel>().apply {
-        invoke(
-            EditTodoViewEvent.Init(toDoToBeEdited)
-        )
+    val editViewModel = viewModel<EditViewModel>()
+    LaunchedEffect(item) {
+        editViewModel.invoke(Init(item))
     }
-    val state = editViewModel.states.collectAsState()
+    val state by editViewModel.states.collectAsState()
+    LaunchedEffect(state.isVisible) {
+        if (state.isVisible) {
+            modalBottomSheetState.show()
+        } else {
+            modalBottomSheetState.hide()
+        }
+    }
+
     BottomSheet(
         onBackPressed = {
-            onEvent(OnCancel)
+            fooLog("onCancel")
         },
         content = {
             Content(
-                state = state.value,
+                state = state,
                 onCancel = {
-                    onEvent(OnCancel)
+                    fooLog("onCancel")
                 }
             )
         },
-        modalBottomSheetState = rememberModalBottomSheetState(
-            ModalBottomSheetValue.Hidden
-        )
+        modalBottomSheetState = modalBottomSheetState
     )
 }
 

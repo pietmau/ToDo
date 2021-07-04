@@ -1,5 +1,6 @@
 package com.pppp.database
 
+import android.util.Log
 import com.google.firebase.firestore.*
 import com.pppp.entities.ToDo
 import com.pppp.usecases.Repository

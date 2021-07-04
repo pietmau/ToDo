@@ -19,7 +19,6 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
-import com.pppp.todo.main.viewmodel.OneOffEvent
 import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
 import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import kotlinx.coroutines.flow.collect
@@ -30,7 +29,6 @@ import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
     val viewModel: MainViewModel = viewModel()
     val state by viewModel.states.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -46,28 +44,25 @@ fun MainScreen() {
                 when (it) {
                     is OpenAddToDoModal -> addToDoBottomSheetState.show()
                     is CloseAddToDoModal -> addToDoBottomSheetState.hide()
-                    is OneOffEvent.OpenEditModal -> TODO()
                 }.exaustive
             }
         }
     }
-    NavHost(navController, Navigation.NONE) {
-        composable(Navigation.NONE) { /* NoOp */ }
-    }
     MainScreenImpl(state) {
-        viewModel.invoke(it)
+        viewModel(it)
     }
     AddBottomSheet(addToDoBottomSheetState, {
         coroutineScope.launch {
             addToDoBottomSheetState.hide()
         }
     }) {
-        viewModel.invoke(it)
+        viewModel(it)
     }
-    EditBottomSheet(editToDoBottomSheetState) {
-        viewModel.invoke(it)
+    EditBottomSheet(state.itemBeingEdited, editToDoBottomSheetState) {
+        viewModel(it)
     }
 }
+
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi

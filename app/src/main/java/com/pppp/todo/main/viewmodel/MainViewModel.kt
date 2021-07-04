@@ -10,13 +10,10 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
 import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
 import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
-import com.pppp.todo.main.viewmodel.OneOffEvent.OpenEditModal
-import com.pppp.todo.toDoViewModel
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
 import com.pppp.usecases.EditTodoUseCase.Params.Edit
 import com.pppp.usecases.todolist.GetToDoUseCase
-import com.pppp.usecases.todolist.GetToDoUseCase.Params.GetSingle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,19 +39,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    override fun invoke(event: MainViewEvent) =
-        when (event) {
-            is OnToDoAdded -> addToDo(event.title, event.due)
-            is OnToDoCompleted -> completeToDo(event.id, event.completed)
-            is OnAddToDoClicked -> onAddToDoClicked()
-            is OnEditToDoClicked -> onEditClicked(event.id)
-            is OnCancel -> Unit
-        }
+    override fun invoke(event: MainViewEvent) = when (event) {
+        is OnToDoAdded -> addToDo(event.title, event.due)
+        is OnToDoCompleted -> completeToDo(event.id, event.completed)
+        is OnAddToDoClicked -> onAddToDoClicked()
+        is OnEditToDoClicked -> onEditClicked(event.id)
+        is OnCancel -> Unit
+    }
 
     private fun onEditClicked(id: String) = launch {
-        getToDoUseCase(GetSingle(id)).collect {
-            it.firstOrNull()?.id?.let { emitOneOffEvent(OpenEditModal(it)) }
-        }
+        emitViewState(state.copy(itemBeingEdited = id))
     }
 
     private fun onAddToDoClicked() = launch {
