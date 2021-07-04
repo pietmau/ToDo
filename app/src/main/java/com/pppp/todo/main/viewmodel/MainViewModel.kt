@@ -3,9 +3,14 @@ package com.pppp.todo.main.viewmodel
 import com.pppp.database.FirebaseRepository.Companion.COMPLETED
 import com.pppp.entities.ToDo
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.main.viewmodel.MainViewEvent.*
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
 import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
 import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
+import com.pppp.todo.main.viewmodel.OneOffEvent.OpenEditModal
 import com.pppp.todo.toDoViewModel
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
@@ -46,13 +51,9 @@ class MainViewModel @Inject constructor(
             is OnCancel -> Unit
         }
 
-    private fun onEditClicked(id: String) {
-        launch {
-            getToDoUseCase(GetSingle(id)).collect {
-                if (it.isNotEmpty()) {
-                    //emitViewState(state.copy(toDoBeingEdited = it.first().toDoViewModel()))
-                }
-            }
+    private fun onEditClicked(id: String) = launch {
+        getToDoUseCase(GetSingle(id)).collect {
+            it.firstOrNull()?.id?.let { emitOneOffEvent(OpenEditModal(it)) }
         }
     }
 
@@ -60,14 +61,12 @@ class MainViewModel @Inject constructor(
         emitOneOffEvent(OpenAddToDoModal)
     }
 
-    private fun completeToDo(id: String, completed: Boolean) =
-        launch {
-            editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))
-        }
+    private fun completeToDo(id: String, completed: Boolean) = launch {
+        editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))
+    }
 
-    private fun addToDo(title: String, due: Long?) =
-        launch {
-            editTodoUseCase(Add(title = title, due = due))
-            emitOneOffEvent(CloseAddToDoModal)
-        }
+    private fun addToDo(title: String, due: Long?) = launch {
+        editTodoUseCase(Add(title = title, due = due))
+        emitOneOffEvent(CloseAddToDoModal)
+    }
 }

@@ -34,15 +34,19 @@ fun MainScreen() {
     val viewModel: MainViewModel = viewModel()
     val state by viewModel.states.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+    val addToDoBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+        ModalBottomSheetValue.Hidden
+    )
+    val editToDoBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             viewModel.oneOffEvents.collect {
                 when (it) {
-                    OpenAddToDoModal -> modalBottomSheetState.show()
-                    CloseAddToDoModal -> modalBottomSheetState.hide()
+                    is OpenAddToDoModal -> addToDoBottomSheetState.show()
+                    is CloseAddToDoModal -> addToDoBottomSheetState.hide()
+                    is OneOffEvent.OpenEditModal -> TODO()
                 }.exaustive
             }
         }
@@ -53,16 +57,16 @@ fun MainScreen() {
     MainScreenImpl(state) {
         viewModel.invoke(it)
     }
-    AddBottomSheet(modalBottomSheetState, {
+    AddBottomSheet(addToDoBottomSheetState, {
         coroutineScope.launch {
-            modalBottomSheetState.hide()
+            addToDoBottomSheetState.hide()
         }
     }) {
         viewModel.invoke(it)
     }
-//    EditBottomSheet(state.toDoBeingEdited) {
-//        viewModel.invoke(it)
-//    }
+    EditBottomSheet(editToDoBottomSheetState) {
+        viewModel.invoke(it)
+    }
 }
 
 @ExperimentalComposeUiApi
