@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pppp.todo.Navigation
+import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
@@ -59,7 +60,9 @@ fun MainScreen() {
     }) {
         viewModel.invoke(it)
     }
-    //EditBottomSheet(mainViewModel.toDoBeingEdited, onEvent)
+//    EditBottomSheet(state.toDoBeingEdited) {
+//        viewModel.invoke(it)
+//    }
 }
 
 @ExperimentalComposeUiApi

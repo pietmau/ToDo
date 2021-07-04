@@ -43,19 +43,14 @@ class MainViewModel @Inject constructor(
             is OnToDoCompleted -> completeToDo(event.id, event.completed)
             is OnAddToDoClicked -> onAddToDoClicked()
             is OnEditToDoClicked -> onEditClicked(event.id)
-            is OnCancel -> emitViewState(
-                state.copy(
-                    isAddTodoShowing = false,
-                    toDoBeingEdited = null
-                )
-            )
+            is OnCancel -> Unit
         }
 
     private fun onEditClicked(id: String) {
         launch {
             getToDoUseCase(GetSingle(id)).collect {
                 if (it.isNotEmpty()) {
-                    emitViewState(state.copy(toDoBeingEdited = it.first().toDoViewModel()))
+                    //emitViewState(state.copy(toDoBeingEdited = it.first().toDoViewModel()))
                 }
             }
         }

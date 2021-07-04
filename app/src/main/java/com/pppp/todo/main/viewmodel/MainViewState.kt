@@ -3,9 +3,7 @@ package com.pppp.todo.main.viewmodel
 data class MainViewState(
     val isLoading: Boolean = true,
     val todos: List<ToDoViewModel> = emptyList(),
-    val error: ErrorMessage? = null,
-    val isAddTodoShowing: Boolean = false,
-    val toDoBeingEdited: ToDoViewModel? = null
+    val error: ErrorMessage? = null
 )
 
 
