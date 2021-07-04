@@ -29,9 +29,3 @@ fun ToDo.toDoViewModel() = ToDoViewModel(
     starred = starred,
     due = due
 )
-
-fun fooLog(text: String, tag: String = "foo") {
-    if (BuildConfig.DEBUG) {
-        Log.e(tag, text)
-    }
-}

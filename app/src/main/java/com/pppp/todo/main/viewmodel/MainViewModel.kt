@@ -2,9 +2,9 @@ package com.pppp.todo.main.viewmodel
 
 import com.pppp.entities.ToDo
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.fooLog
 import com.pppp.todo.main.viewmodel.MainViewEvent.*
 import com.pppp.todo.toDoViewModel
+import com.pppp.uielements.fooLog
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
 import com.pppp.usecases.EditTodoUseCase.Params.Edit

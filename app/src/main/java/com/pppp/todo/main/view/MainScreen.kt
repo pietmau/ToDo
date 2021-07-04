@@ -15,16 +15,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.pppp.todo.Navigation
-import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
-import com.pppp.todo.fooLog
-import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.NavigationEvent
+import com.pppp.uielements.fooLog
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
-import kotlinx.coroutines.flow.collect
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -42,21 +41,15 @@ fun MainScreen() {
         fooLog("LaunchedEffect")
         coroutineScope.launch {
             viewModel.navigationEvents.collect {
-                fooLog("viewModel.navigationEvents.collect", "foo")
+                fooLog("viewModel.navigationEvents.collect")
                 when (it) {
-                    NavigationEvent.Foo -> navController.navigate(Navigation.ADD_TODO_MODAL)
+                    NavigationEvent.Foo ->  modalBottomSheetState.show()
                 }.exaustive
             }
         }
     }
     NavHost(navController = navController, startDestination = Navigation.NONE) {
         composable(Navigation.NONE) { /* NoOp */ }
-        composable(Navigation.ADD_TODO_MODAL) {
-            coroutineScope.launch {
-                Log.e("foo", "Navigation.ADD_TODO_MODAL")
-                modalBottomSheetState.show()
-            }
-        }
     }
     MainScreenImpl(state) {
         viewModel.invoke(it)

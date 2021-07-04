@@ -26,13 +26,10 @@ fun BottomSheet(
         content = {}
     )
     val coroutineScope = rememberCoroutineScope()
-    Log.e(
-        "foo",
-        "modalBottomSheetState " + modalBottomSheetState.currentValue
-    )
+    fooLog("modalBottomSheetState " + modalBottomSheetState.currentValue)
     BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
         coroutineScope.launch {
-            Log.e("foo", "BottomSheet onBackPressed")
+            fooLog( "BottomSheet onBackPressed")
             onBackPressed()
         }
     }

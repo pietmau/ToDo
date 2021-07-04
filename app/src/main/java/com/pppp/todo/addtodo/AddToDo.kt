@@ -26,10 +26,10 @@ import com.pppp.todo.addtodo.Event
 import com.pppp.todo.addtodo.OneOffEvent
 import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
-import com.pppp.todo.fooLog
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.uielements.BottomSheet
+import com.pppp.uielements.fooLog
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -42,7 +42,6 @@ fun AddBottomSheet(
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
     val viewmodel: AddTodoViewModel = viewModel()
-    val viewState = viewmodel.states.collectAsState()
     val scope = rememberCoroutineScope()
     LaunchedEffect(viewmodel) {
         scope.launch {
@@ -50,7 +49,6 @@ fun AddBottomSheet(
                 when (it) {
                     is OneOffEvent.AddToDo -> {
                         onEvent(OnToDoAdded(title = it.title, due = it.due))
-                        //modalBottomSheetState.hide()
                     }
                 }.exaustive
             }
@@ -63,12 +61,11 @@ fun AddBottomSheet(
             scope.launch {
                 fooLog(text = "modalBottomSheetState.hide()")
                 onBackPressed()
-                //modalBottomSheetState.hide()
             }
         },
     )
     {
-        AddToDo(viewState) {
+        AddToDo(viewmodel.states.collectAsState()) {
             viewmodel.invoke(it)
         }
     }
