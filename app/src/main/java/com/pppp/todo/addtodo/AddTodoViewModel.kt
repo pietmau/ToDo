@@ -7,6 +7,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import com.pppp.todo.addtodo.Event.DoneClicked
 import com.pppp.todo.addtodo.Event.OnTitleChanged
+import com.pppp.todo.addtodo.Event.OnTimeDataPicked
 import com.pppp.todo.addtodo.OneOffEvent.AddToDo
 
 @HiltViewModel
@@ -21,7 +22,11 @@ class AddTodoViewModel @Inject constructor() :
         when (event) {
             is DoneClicked -> onDoneClicked()
             is OnTitleChanged -> onTitleChanged(event)
+            is OnTimeDataPicked -> onTimeDataPicked(event.due)
         }
+
+    private fun onTimeDataPicked(due: Long) =
+        emitViewState(state.copy(due = due))
 
     private fun onTitleChanged(event: OnTitleChanged) =
         emitViewState(state.copy(title = event.title, isError = false))
@@ -43,6 +48,7 @@ data class ViewState(
 sealed class Event {
     object DoneClicked : Event()
     data class OnTitleChanged(val title: String) : Event()
+    data class OnTimeDataPicked(val due: Long) : Event()
 }
 
 sealed class OneOffEvent {

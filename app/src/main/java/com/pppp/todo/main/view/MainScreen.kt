@@ -1,6 +1,5 @@
 package com.pppp.todo.main.view
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -19,8 +18,7 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
-import com.pppp.todo.main.viewmodel.NavigationEvent
-import com.pppp.uielements.fooLog
+import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
@@ -29,7 +27,6 @@ import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen() {
-    fooLog(text = "MainScreen")
     val navController = rememberNavController()
     val viewModel: MainViewModel = viewModel()
     val state by viewModel.states.collectAsState()
@@ -38,23 +35,21 @@ fun MainScreen() {
         ModalBottomSheetValue.Hidden
     )
     LaunchedEffect(Unit) {
-        fooLog("LaunchedEffect")
         coroutineScope.launch {
             viewModel.navigationEvents.collect {
-                fooLog("viewModel.navigationEvents.collect")
                 when (it) {
-                    NavigationEvent.Foo ->  modalBottomSheetState.show()
+                    OpenAddToDoModal -> modalBottomSheetState.show()
                 }.exaustive
             }
         }
     }
-    NavHost(navController = navController, startDestination = Navigation.NONE) {
+    NavHost(navController, Navigation.NONE) {
         composable(Navigation.NONE) { /* NoOp */ }
     }
     MainScreenImpl(state) {
         viewModel.invoke(it)
     }
-    AddBottomSheet(modalBottomSheetState = modalBottomSheetState, onBackPressed = {
+    AddBottomSheet(modalBottomSheetState, {
         coroutineScope.launch {
             modalBottomSheetState.hide()
         }

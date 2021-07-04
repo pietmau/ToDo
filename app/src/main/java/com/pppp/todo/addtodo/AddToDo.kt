@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,8 +29,12 @@ import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
+import com.pppp.todo.toDueDateText
+import com.pppp.todo.toEpochMillis
 import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.fooLog
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -113,48 +118,46 @@ fun AddToDoInputControl(
             }
         }
         Row {
-            //Calendar(state, onEvent) TODO
+            Calendar(state, onEvent)
         }
     }
 }
 
-//@Composable
-//private fun Calendar(
-//    state: MutableState<AddTodoViewModel.ViewState> = remember {
-//        mutableStateOf(AddTodoViewModel.ViewState())
-//    },
-//    onEvent: (AddTodoViewModel.Event) -> Unit = {}
-//) {
-//    val dialog = remember { MaterialDialog() }
-//    dialog.build {
-//        datetimepicker {
-//            state.value = state.value.copy(
-//                dueDate = it.toEpochMillis()
-//            )
-//        }
-//    }
-//    Row(
-//        verticalAlignment = Alignment.CenterVertically,
-//        modifier = Modifier
-//            .clickable {
-//                dialog.show()
-//            }
-//            .padding(all = 8.dp)
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//        ) {
-//            Image(
-//                imageVector = Icons.Outlined.DateRange,
-//                contentDescription = "",
-//            )
-//            Text(
-//                text = state.value.dueDate?.toDueDateText() ?: "Due",//TODO extract
-//                style = MaterialTheme.typography.caption
-//            )
-//        }
-//    }
-//}
+@Composable
+private fun Calendar(
+    state: State<ViewState> = remember {
+        mutableStateOf(ViewState())
+    },
+    onEvent: (Event) -> Unit = {}
+) {
+    val dialog = remember { MaterialDialog() }
+    dialog.build {
+        datetimepicker {
+            onEvent(Event.OnTimeDataPicked(it.toEpochMillis()))
+        }
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable {
+                dialog.show()
+            }
+            .padding(all = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                imageVector = Icons.Outlined.DateRange,
+                contentDescription = "",
+            )
+            Text(
+                text = state.value.due?.toDueDateText() ?: "Due",//TODO extract
+                style = MaterialTheme.typography.caption
+            )
+        }
+    }
+}
 
 @Composable
 private fun DoneButton(onDone: () -> Unit) {

@@ -21,11 +21,11 @@ class MainViewModel @Inject constructor(
     private val editTodoUseCase: EditTodoUseCase,
     private val getToDoUseCase: GetToDoUseCase,
     private val mapper: @JvmSuppressWildcards (List<ToDo>) -> MainViewState
-) : GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, NavigationEvent>() {
+) : GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent>() {
 
     override val _uiStates = MutableStateFlow(MainViewState())
 
-    override val _oneOffEvents = MutableSharedFlow<NavigationEvent>()
+    override val _oneOffEvents = MutableSharedFlow<OneOffEvent>()
 
     init {
         launch {
@@ -61,7 +61,7 @@ class MainViewModel @Inject constructor(
 
     private fun onAddToDoClicked() = launch {
         fooLog("onAddToDoClicked", this::class.simpleName!!)
-        emitOneOffEvent(NavigationEvent.Foo)
+        emitOneOffEvent(OneOffEvent.OpenAddToDoModal)
     }
 
     private fun completeToDo(id: String, completed: Boolean) =
