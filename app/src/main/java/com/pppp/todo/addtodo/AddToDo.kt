@@ -17,7 +17,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,7 +34,6 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.todo.toDueDateText
 import com.pppp.todo.toEpochMillis
 import com.pppp.uielements.BottomSheet
-import com.pppp.uielements.fooLog
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import kotlinx.coroutines.flow.collect
@@ -52,9 +53,8 @@ fun AddBottomSheet(
         scope.launch {
             viewmodel.navigationEvents.collect {
                 when (it) {
-                    is OneOffEvent.AddToDo -> {
-                        onEvent(OnToDoAdded(title = it.title, due = it.due))
-                    }
+                    is OneOffEvent.AddToDo -> onEvent(OnToDoAdded(title = it.title, due = it.due))
+                    is OneOffEvent.OnBackPressed -> onBackPressed()
                 }.exaustive
             }
         }
@@ -62,9 +62,7 @@ fun AddBottomSheet(
     BottomSheet(
         modalBottomSheetState = modalBottomSheetState,
         onBackPressed = {
-            fooLog(text = "AddBottomSheet onBackPressed")
             scope.launch {
-                fooLog(text = "modalBottomSheetState.hide()")
                 onBackPressed()
             }
         },
@@ -100,9 +98,16 @@ fun AddToDoInputControl(
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            val keyboardController = LocalSoftwareKeyboardController.current
+
             TextField(
-                modifier = Modifier.weight(1F),
+                modifier = Modifier
+                    .weight(1F)
+                    .onKeyEvent {
+                        if (it.key.keyCode == Key.Back.keyCode) {
+                            onEvent(Event.OnBackPressed)
+                        }
+                        true
+                    },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),

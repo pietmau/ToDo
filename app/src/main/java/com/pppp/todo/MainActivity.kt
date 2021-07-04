@@ -26,11 +26,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContent {
-            fooLog("setContent")
             ToDoTheme {
-                fooLog("ToDoTheme")
                 Surface(color = MaterialTheme.colors.background) {
-                    fooLog("Surface")
                     MainScreen()
                 }
             }

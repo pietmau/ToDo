@@ -9,6 +9,7 @@ import com.pppp.todo.addtodo.Event.DoneClicked
 import com.pppp.todo.addtodo.Event.OnTitleChanged
 import com.pppp.todo.addtodo.Event.OnTimeDataPicked
 import com.pppp.todo.addtodo.OneOffEvent.AddToDo
+import com.pppp.todo.addtodo.Event.OnBackPressed
 
 @HiltViewModel
 class AddTodoViewModel @Inject constructor() :
@@ -23,7 +24,10 @@ class AddTodoViewModel @Inject constructor() :
             is DoneClicked -> onDoneClicked()
             is OnTitleChanged -> onTitleChanged(event)
             is OnTimeDataPicked -> onTimeDataPicked(event.due)
+            is OnBackPressed -> onBackPressed()
         }
+
+    private fun onBackPressed() = emitOneOffEvent(OneOffEvent.OnBackPressed)
 
     private fun onTimeDataPicked(due: Long) =
         emitViewState(state.copy(due = due))
@@ -47,11 +51,13 @@ data class ViewState(
 
 sealed class Event {
     object DoneClicked : Event()
+    object OnBackPressed : Event()
     data class OnTitleChanged(val title: String) : Event()
     data class OnTimeDataPicked(val due: Long) : Event()
 }
 
 sealed class OneOffEvent {
     data class AddToDo(val title: String, val due: Long? = null) : OneOffEvent()
+    object OnBackPressed : OneOffEvent()
 }
 

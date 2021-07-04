@@ -1,13 +1,16 @@
 package com.pppp.uielements
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -26,10 +29,8 @@ fun BottomSheet(
         content = {}
     )
     val coroutineScope = rememberCoroutineScope()
-    fooLog("modalBottomSheetState " + modalBottomSheetState.currentValue)
     BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
         coroutineScope.launch {
-            fooLog( "BottomSheet onBackPressed")
             onBackPressed()
         }
     }
