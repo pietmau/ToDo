@@ -1,6 +1,5 @@
 package com.pppp.todo.main.viewmodel
 
-import com.pppp.database.FirebaseRepository.Companion.COMPLETED
 import com.pppp.entities.ToDo
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
@@ -13,6 +12,7 @@ import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
 import com.pppp.usecases.EditTodoUseCase.Params.Edit
+import com.pppp.usecases.Repository.Companion.COMPLETED
 import com.pppp.usecases.todolist.GetToDoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,16 +44,14 @@ class MainViewModel @Inject constructor(
         is OnToDoCompleted -> completeToDo(event.id, event.completed)
         is OnAddToDoClicked -> onAddToDoClicked()
         is OnEditToDoClicked -> onEditClicked(event.id)
-        is OnCancel -> Unit
+        is OnCancel -> onCancel()
     }
 
-    private fun onEditClicked(id: String) = launch {
-        emitViewState(state.copy(itemBeingEdited = id))
-    }
+    private fun onCancel() = emitViewState(state.copy(itemBeingEdited = null))
 
-    private fun onAddToDoClicked() = launch {
-        emitOneOffEvent(OpenAddToDoModal)
-    }
+    private fun onEditClicked(id: String) = emitViewState(state.copy(itemBeingEdited = id))
+
+    private fun onAddToDoClicked() = emitOneOffEvent(OpenAddToDoModal)
 
     private fun completeToDo(id: String, completed: Boolean) = launch {
         editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))

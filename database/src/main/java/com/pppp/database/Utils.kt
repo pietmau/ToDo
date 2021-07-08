@@ -3,18 +3,19 @@ package com.pppp.database
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.pppp.entities.ToDo
+import com.pppp.usecases.Repository
 
 fun QuerySnapshot?.toToDoList(): List<ToDo> =
     this?.documents?.map { it.toToDo() }?.sortedWith(ToDoComparator) ?: emptyList()
 
 fun DocumentSnapshot.toToDo() = ToDo(
     id = this.id,
-    title = this.get(FirebaseRepository.TITLE, String::class.java)
-        ?: FirebaseRepository.EMPTY_STRING,
-    starred = this.getBoolean(FirebaseRepository.STARRED) ?: false,
-    created = this.get(FirebaseRepository.CREATED, Long::class.java),
-    completed = this.getBoolean(FirebaseRepository.COMPLETED),
-    due = this.get(FirebaseRepository.DUE, Long::class.java),
+    title = this.get(Repository.TITLE, String::class.java)
+        ?: Repository.EMPTY_STRING,
+    starred = this.getBoolean(Repository.STARRED) ?: false,
+    created = this.get(Repository.CREATED, Long::class.java),
+    completed = this.getBoolean(Repository.COMPLETED),
+    due = this.get(Repository.DUE, Long::class.java),
 )
 
 private object ToDoComparator : Comparator<ToDo> {

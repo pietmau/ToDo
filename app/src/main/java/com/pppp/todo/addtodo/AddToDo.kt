@@ -2,31 +2,50 @@ package com.pppp.todo.main.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue.Hidden
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.runtime.*
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.R
 import com.pppp.todo.addtodo.AddTodoViewModel
 import com.pppp.todo.addtodo.Event
-import com.pppp.todo.addtodo.OneOffEvent
+import com.pppp.todo.addtodo.OneOffEvent.AddToDo
+import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed
 import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
@@ -38,14 +57,13 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import com.pppp.todo.addtodo.OneOffEvent.AddToDo
-import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed
+
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
 fun AddBottomSheet(
-    modalBottomSheetState: ModalBottomSheetState,
+    modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden),
     onBackPressed: () -> Unit = {},
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
@@ -100,7 +118,6 @@ fun AddToDoInputControl(
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-
             TextField(
                 modifier = Modifier
                     .weight(1F)
@@ -120,12 +137,28 @@ fun AddToDoInputControl(
                 },
                 isError = state.value.isError
             )
-            DoneButton {
-                onEvent(Event.DoneClicked)
-            }
         }
         Row {
             Calendar(state, onEvent)
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                modifier = Modifier.padding(end = 8.dp, top = 8.dp),
+                onClick = {
+                    onEvent(Event.OnBackPressed)
+                }) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+            Button(
+                modifier = Modifier.padding(top = 8.dp),
+                onClick = {
+                    onEvent(Event.DoneClicked)
+                }) {
+                Text(text = stringResource(id = R.string.save))
+            }
         }
     }
 }

@@ -8,12 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.pppp.todo.Navigation
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
@@ -21,6 +19,7 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
 import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
@@ -32,18 +31,23 @@ fun MainScreen() {
     val viewModel: MainViewModel = viewModel()
     val state by viewModel.states.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val addToDoBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+    val addToDoBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )
-    val editToDoBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+    val editToDoBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             viewModel.oneOffEvents.collect {
                 when (it) {
                     is OpenAddToDoModal -> addToDoBottomSheetState.show()
-                    is CloseAddToDoModal -> addToDoBottomSheetState.hide()
+                    is CloseAddToDoModal -> addToDoBottomSheetState.close(
+                        coroutineScope,
+                        keyboardController
+                    )
                 }.exaustive
             }
         }
@@ -53,7 +57,7 @@ fun MainScreen() {
     }
     AddBottomSheet(addToDoBottomSheetState, {
         coroutineScope.launch {
-            addToDoBottomSheetState.hide()
+            addToDoBottomSheetState.close(coroutineScope, keyboardController)
         }
     }) {
         viewModel(it)
@@ -63,6 +67,17 @@ fun MainScreen() {
     }
 }
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+private fun ModalBottomSheetState.close(
+    coroutineScope: CoroutineScope,
+    keyboardController: SoftwareKeyboardController?
+) {
+    coroutineScope.launch {
+        hide()
+        keyboardController?.hide()
+    }
+}
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -84,7 +99,6 @@ private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (MainViewE
         }
     }
 }
-
 
 @Composable
 fun Fab(onClick: () -> Unit) {

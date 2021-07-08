@@ -8,6 +8,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -28,6 +29,11 @@ fun BottomSheet(
         sheetShape = RoundedCornerShape(4.dp),
         content = {}
     )
+    LaunchedEffect(modalBottomSheetState.currentValue) {
+        if (modalBottomSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+            onBackPressed()
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
         coroutineScope.launch {

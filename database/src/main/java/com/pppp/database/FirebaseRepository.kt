@@ -1,9 +1,10 @@
 package com.pppp.database
 
-import android.util.Log
 import com.google.firebase.firestore.*
 import com.pppp.entities.ToDo
 import com.pppp.usecases.Repository
+import com.pppp.usecases.Repository.Companion.ID
+import com.pppp.usecases.Repository.Companion.TODOS
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -70,16 +71,5 @@ class FirebaseRepository(
                 continuation.resume(id)
             }
         }
-
-    companion object {
-        const val ID = "id"
-        const val TODOS = "todos"
-        const val TITLE = "title"
-        const val STARRED = "starred"
-        const val CREATED = "created"
-        const val COMPLETED = "completed"
-        const val DUE = "due"
-        const val EMPTY_STRING = ""
-    }
 }
 

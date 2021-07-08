@@ -17,4 +17,14 @@ interface Repository {
         data class Add(val title: String, val due: Long? = null)
     }
 
+    companion object {
+        const val ID = "id"
+        const val TODOS = "todos"
+        const val TITLE = "title"
+        const val STARRED = "starred"
+        const val CREATED = "created"
+        const val COMPLETED = "completed"
+        const val DUE = "due"
+        const val EMPTY_STRING = ""
+    }
 }

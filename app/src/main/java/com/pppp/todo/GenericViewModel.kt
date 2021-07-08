@@ -2,6 +2,7 @@ package com.pppp.todo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -14,6 +15,7 @@ abstract class GenericViewModel<ViewState, Event> : ViewModel(), Consumer<Event>
 
     val states: StateFlow<ViewState>
         get() = _uiStates
+
     protected fun launch(block: suspend () -> Unit) {
         viewModelScope.launch {
             block()
@@ -21,6 +23,8 @@ abstract class GenericViewModel<ViewState, Event> : ViewModel(), Consumer<Event>
     }
 
     protected fun emitViewState(state: ViewState) {
-        _uiStates.value = state
+        viewModelScope.launch {
+            _uiStates.value = state
+        }
     }
 }
