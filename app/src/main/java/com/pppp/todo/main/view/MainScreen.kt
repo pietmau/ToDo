@@ -17,12 +17,12 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
-import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
-import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
+import com.pppp.todo.main.viewmodel.AddToDo.Hidden
+import com.pppp.todo.main.viewmodel.AddToDo.Showing
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -39,27 +39,21 @@ fun MainScreen() {
     )
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            viewModel.oneOffEvents.collect {
-                when (it) {
-                    is OpenAddToDoModal -> addToDoBottomSheetState.show()
-                    is CloseAddToDoModal -> addToDoBottomSheetState.close(
-                        coroutineScope,
-                        keyboardController
-                    )
-                }.exaustive
-            }
+    LaunchedEffect(state.addToDo) {
+        launch {
+            when (state.addToDo) {
+                Hidden -> addToDoBottomSheetState.close(
+                    this,
+                    keyboardController
+                )
+                Showing -> addToDoBottomSheetState.show()
+            }.exaustive
         }
     }
     MainScreenImpl(state) {
         viewModel(it)
     }
-    AddBottomSheet(addToDoBottomSheetState, {
-        coroutineScope.launch {
-            addToDoBottomSheetState.close(coroutineScope, keyboardController)
-        }
-    }) {
+    AddBottomSheet(addToDoBottomSheetState) {
         viewModel(it)
     }
     EditBottomSheet(state.itemBeingEdited, editToDoBottomSheetState) {
@@ -75,7 +69,7 @@ private fun ModalBottomSheetState.close(
 ) {
     coroutineScope.launch {
         hide()
-        keyboardController?.hide()
+       // keyboardController?.hide()
     }
 }
 

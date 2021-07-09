@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -35,7 +34,7 @@ fun BottomSheet(
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
+    BackHandler(false) {
         coroutineScope.launch {
             onBackPressed()
         }

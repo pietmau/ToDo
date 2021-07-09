@@ -64,27 +64,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddBottomSheet(
     modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden),
-    onBackPressed: () -> Unit = {},
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
     val viewmodel: AddTodoViewModel = viewModel()
     val scope = rememberCoroutineScope()
-    LaunchedEffect(viewmodel) {
-        scope.launch {
-            viewmodel.oneOffEvents.collect {
-                when (it) {
-                    is AddToDo -> onEvent(OnToDoAdded(title = it.title, due = it.due))
-                    is OnBackPressed -> onBackPressed()
-                }.exaustive
-            }
-        }
-    }
     BottomSheet(
         modalBottomSheetState = modalBottomSheetState,
         onBackPressed = {
-            scope.launch {
-                onBackPressed()
-            }
+            onEvent(MainViewEvent.OnCancel)
         },
     )
     {

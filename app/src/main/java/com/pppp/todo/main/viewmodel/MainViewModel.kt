@@ -7,8 +7,6 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
-import com.pppp.todo.main.viewmodel.OneOffEvent.CloseAddToDoModal
-import com.pppp.todo.main.viewmodel.OneOffEvent.OpenAddToDoModal
 import com.pppp.usecases.EditTodoUseCase
 import com.pppp.usecases.EditTodoUseCase.Params.Add
 import com.pppp.usecases.EditTodoUseCase.Params.Edit
@@ -47,11 +45,11 @@ class MainViewModel @Inject constructor(
         is OnCancel -> onCancel()
     }
 
-    private fun onCancel() = emitViewState(state.copy(itemBeingEdited = null))
+    private fun onCancel() = emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
 
     private fun onEditClicked(id: String) = emitViewState(state.copy(itemBeingEdited = id))
 
-    private fun onAddToDoClicked() = emitOneOffEvent(OpenAddToDoModal)
+    private fun onAddToDoClicked() = emitViewState(state.copy(addToDo = AddToDo.Showing))
 
     private fun completeToDo(id: String, completed: Boolean) = launch {
         editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))
@@ -59,6 +57,6 @@ class MainViewModel @Inject constructor(
 
     private fun addToDo(title: String, due: Long?) = launch {
         editTodoUseCase(Add(title = title, due = due))
-        emitOneOffEvent(CloseAddToDoModal)
+
     }
 }

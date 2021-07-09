@@ -4,9 +4,14 @@ data class MainViewState(
     val isLoading: Boolean = true,
     val todos: List<ToDoViewModel> = emptyList(),
     val error: ErrorMessage? = null,
-    val itemBeingEdited: String? = null
+    val itemBeingEdited: String? = null,
+    val addToDo: AddToDo = AddToDo.Hidden
 )
 
+sealed class AddToDo {
+    object Hidden : AddToDo()
+    object Showing : AddToDo()
+}
 
 data class ToDoViewModel(
     val id: String,
