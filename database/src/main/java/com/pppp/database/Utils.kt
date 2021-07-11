@@ -1,8 +1,6 @@
 package com.pppp.database
 
-import com.google.firebase.firestore.DocumentSnapshot
 import com.pppp.entities.ToDo
-import com.pppp.usecases.ToDosRepository
 
 internal object ToDoComparator : Comparator<ToDo> {
     override fun compare(o1: ToDo, o2: ToDo): Int {

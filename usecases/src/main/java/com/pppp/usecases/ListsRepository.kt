@@ -7,11 +7,12 @@ import kotlinx.coroutines.flow.Flow
 interface ListsRepository {
     suspend fun getLists(): Flow<List<ToDoList>>
 
-    suspend fun addList(toDoList: ToDoList)
+    suspend fun addList(toDoList: ToDoList): String
 
     suspend fun editList(toDoList: ToDoList): String
 
     companion object {
+        const val ID = "id"
         const val USERS = "users"
         const val LISTS = "lists"
         const val LIST_ID = "list_id"

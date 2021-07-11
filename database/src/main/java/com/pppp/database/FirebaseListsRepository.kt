@@ -3,19 +3,17 @@ package com.pppp.database
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import com.pppp.entities.ToDo
 import com.pppp.entities.ToDoList
 import com.pppp.usecases.ListsRepository
 import com.pppp.usecases.ListsRepository.Companion.ARCHIVED
 import com.pppp.usecases.ListsRepository.Companion.CREATED
 import com.pppp.usecases.ListsRepository.Companion.DELETED
+import com.pppp.usecases.ListsRepository.Companion.ID
 import com.pppp.usecases.ListsRepository.Companion.LISTS
 import com.pppp.usecases.ListsRepository.Companion.LIST_ID
 import com.pppp.usecases.ListsRepository.Companion.MODIFIED
 import com.pppp.usecases.ListsRepository.Companion.PRIORITY
 import com.pppp.usecases.ListsRepository.Companion.USERS
-import com.pppp.usecases.ToDosRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -42,22 +40,27 @@ class FirebaseListsRepository(
             }
         }
 
-    override suspend fun addList(toDoList: ToDoList) {
-        db.collection(USERS).document(userId).get().addOnSuccessListener {
-
-        }.addOnFailureListener {
-            addUser()
+    override suspend fun addList(toDoList: ToDoList): String =
+        suspendCoroutine { continuation ->
+            db.runTransaction { transaction ->
+                val collection =
+                    db.collection(USERS).document(userId).collection(LISTS)
+                collection.add(toDoList)
+                    .addOnSuccessListener { docRef ->
+                        db.runTransaction { transaction ->
+                            transaction.update(
+                                docRef,
+                                mapOf((ID to docRef.id), (LIST_ID to docRef.id))
+                            )
+                        }
+                        continuation.resume(docRef.id)
+                    }
+            }
         }
-    }
-
-    private fun addUser(): String {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun editList(toDoList: ToDoList): String {
         TODO("Not yet implemented")
     }
-
 }
 
 private fun QuerySnapshot?.toLists(): List<ToDoList> =

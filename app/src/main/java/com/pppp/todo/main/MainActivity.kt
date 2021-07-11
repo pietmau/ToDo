@@ -16,6 +16,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pppp.database.FirebaseListsRepository
+import com.pppp.entities.ToDoList
 import com.pppp.todo.main.view.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
 import com.pppp.uielements.fooLog
@@ -32,9 +33,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-            FirebaseListsRepository(Firebase.firestore, Firebase.auth.currentUser!!.uid).getLists().collect {
-
-            }
+            val db = FirebaseListsRepository(Firebase.firestore, Firebase.auth.currentUser!!.uid)
+            db.addList(ToDoList())
         }
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContent {

@@ -57,7 +57,7 @@ class FirebaseToDosRepository(private val db: FirebaseFirestore) : ToDosReposito
                     created = System.currentTimeMillis(),
                     due = params.due
                 )
-            ).addOnSuccessListener { document ->
+            ).addOnSuccessListener { document -> // TODO FIXME, this is must be a single transaction
                 db.runTransaction { transaction ->
                     transaction.update(document, mapOf(ID to document.id))
                 }
