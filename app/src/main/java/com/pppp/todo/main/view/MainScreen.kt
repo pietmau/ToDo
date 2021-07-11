@@ -30,7 +30,6 @@ import com.pppp.todo.main.viewmodel.AddToDo.Showing
 fun MainScreen() {
     val viewModel: MainViewModel = viewModel()
     val state by viewModel.states.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
     val addToDoBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )

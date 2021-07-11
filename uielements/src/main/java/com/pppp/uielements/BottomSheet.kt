@@ -34,7 +34,7 @@ fun BottomSheet(
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    BackHandler(false) {
+    BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
         coroutineScope.launch {
             onBackPressed()
         }

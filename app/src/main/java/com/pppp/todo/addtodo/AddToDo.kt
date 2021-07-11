@@ -67,7 +67,14 @@ fun AddBottomSheet(
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
     val viewmodel: AddTodoViewModel = viewModel()
-    val scope = rememberCoroutineScope()
+    LaunchedEffect(onEvent) {
+        viewmodel.oneOffEvents.collect {
+            when (it) {
+                is AddToDo -> Unit
+                is OnBackPressed -> onEvent(MainViewEvent.OnCancel)
+            }.exaustive
+        }
+    }
     BottomSheet(
         modalBottomSheetState = modalBottomSheetState,
         onBackPressed = {
@@ -112,7 +119,7 @@ fun AddToDoInputControl(
                         if (it.key.keyCode == Key.Back.keyCode) {
                             onEvent(Event.OnBackPressed)
                         }
-                        true
+                        false
                     },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
