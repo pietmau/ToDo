@@ -29,13 +29,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +49,6 @@ import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed
 import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.todo.toDueDateText
 import com.pppp.todo.toMillis
 import com.pppp.uielements.BottomSheet
@@ -63,14 +62,35 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterialApi
 @Composable
 fun AddBottomSheet(
-    modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden),
+    isVisible: Boolean = false,
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
+    val modalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(isVisible) {
+        launch {
+            when (isVisible) {
+                true -> modalBottomSheetState.show()
+                false -> {
+                    modalBottomSheetState.hide()
+                    keyboardController?.hide()
+                }
+            }.exaustive
+        }
+    }
+
     val viewmodel: AddTodoViewModel = viewModel()
+
     LaunchedEffect(onEvent) {
         viewmodel.oneOffEvents.collect {
             when (it) {
-                is AddToDo -> Unit
+                is AddToDo -> onEvent(
+                    MainViewEvent.OnToDoAdded(
+                        title = it.title,
+                        due = it.due
+                    )
+                )
                 is OnBackPressed -> onEvent(MainViewEvent.OnCancel)
             }.exaustive
         }
@@ -83,7 +103,7 @@ fun AddBottomSheet(
     )
     {
         AddToDo(viewmodel.states.collectAsState()) {
-            viewmodel.invoke(it)
+            viewmodel(it)
         }
     }
 }

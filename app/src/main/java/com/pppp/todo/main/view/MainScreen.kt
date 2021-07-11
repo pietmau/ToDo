@@ -52,7 +52,7 @@ fun MainScreen() {
     MainScreenImpl(state) {
         viewModel(it)
     }
-    AddBottomSheet(addToDoBottomSheetState) {
+    AddBottomSheet(state.addToDo == Showing) {
         viewModel(it)
     }
     EditBottomSheet(state.itemBeingEdited, editToDoBottomSheetState) {
@@ -68,7 +68,7 @@ private fun ModalBottomSheetState.close(
 ) {
     coroutineScope.launch {
         hide()
-       // keyboardController?.hide()
+        // keyboardController?.hide()
     }
 }
 
