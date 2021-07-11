@@ -1,9 +1,11 @@
 package com.pppp.entities
 
 data class ToDoList(
-    val items: List<ToDo>,
-    val created: Long,
-    val modified: Long,
+    val id: String? = null,
+    val listId: String,
+    val created: Long? = null,
+    val modified: Long? = null,
     val archived: Boolean = false,
-    val deleted: Boolean = false
+    val deleted: Boolean = false,
+    val priority: Long = 0
 )

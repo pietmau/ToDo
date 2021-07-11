@@ -3,7 +3,7 @@ package com.pppp.usecases
 import  com.pppp.entities.ToDo
 import kotlinx.coroutines.flow.Flow
 
-interface Repository {
+interface ToDosRepository {
 
     suspend fun getToDo(): Flow<List<ToDo>>
 

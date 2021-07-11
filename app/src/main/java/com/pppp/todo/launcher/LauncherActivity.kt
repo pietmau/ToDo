@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.EmailBuilder
-import com.firebase.ui.auth.AuthUI.IdpConfig.PhoneBuilder
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

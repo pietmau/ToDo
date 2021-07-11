@@ -8,11 +8,11 @@ import com.pppp.todo.edittodo.EditTodoViewEvent.OnDateTimePicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.edittodo.OneOffEvents.OnCancel
-import com.pppp.usecases.EditTodoUseCase
-import com.pppp.usecases.Repository.Companion.DUE
-import com.pppp.usecases.Repository.Companion.TITLE
-import com.pppp.usecases.todolist.GetToDoUseCase
-import com.pppp.usecases.todolist.GetToDoUseCase.Params.GetSingle
+import com.pppp.usecases.todos.EditTodoUseCase
+import com.pppp.usecases.ToDosRepository.Companion.DUE
+import com.pppp.usecases.ToDosRepository.Companion.TITLE
+import com.pppp.usecases.todos.GetToDoUseCase
+import com.pppp.usecases.todos.GetToDoUseCase.Params.GetSingle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

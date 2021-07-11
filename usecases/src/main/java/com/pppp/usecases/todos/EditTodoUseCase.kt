@@ -1,10 +1,12 @@
-package com.pppp.usecases
+package com.pppp.usecases.todos
 
-import com.pppp.usecases.Repository.Params.Add
+import com.pppp.usecases.ToDosRepository
+import com.pppp.usecases.ToDosRepository.Params.Add
+import com.pppp.usecases.UseCase
 import com.pppp.usecases.notification.NotificationScheduler
 
 class EditTodoUseCase(
-    private val repository: Repository,
+    private val toDosRepository: ToDosRepository,
     private val notificationScheduler: NotificationScheduler
 ) :
     UseCase<String, EditTodoUseCase.Params> {
@@ -16,13 +18,13 @@ class EditTodoUseCase(
         }
 
     private suspend fun add(title: String, due: Long?): String {
-        val id = repository.addToDo(Add(title = title, due = due))
+        val id = toDosRepository.addToDo(Add(title = title, due = due))
         notificationScheduler.trySchedule(id, title, due)
         return id
     }
 
     private suspend fun edit(id: String, values: Map<String, Any?>): String {
-        repository.edit(id, values)
+        toDosRepository.edit(id, values)
         notificationScheduler.trySchedule(id, values)
         return id
     }

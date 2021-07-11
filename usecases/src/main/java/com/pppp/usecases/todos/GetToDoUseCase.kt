@@ -1,18 +1,18 @@
-package com.pppp.usecases.todolist
+package com.pppp.usecases.todos
 
 import com.pppp.entities.ToDo
 import com.pppp.usecases.FlowUseCase
-import com.pppp.usecases.Repository
+import com.pppp.usecases.ToDosRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetToDoUseCase(private val repository: Repository) :
+class GetToDoUseCase(private val toDosRepository: ToDosRepository) :
     FlowUseCase<List<ToDo>, GetToDoUseCase.Params?> {
 
     override suspend fun invoke(params: Params?): Flow<List<ToDo>> =
         when (params) {
-            is Params.GetAll -> repository.getToDo()
-            is Params.GetSingle -> repository.getToDo(params.id)
-            null -> repository.getToDo()
+            is Params.GetAll -> toDosRepository.getToDo()
+            is Params.GetSingle -> toDosRepository.getToDo(params.id)
+            null -> toDosRepository.getToDo()
         }
 
     sealed class Params {
