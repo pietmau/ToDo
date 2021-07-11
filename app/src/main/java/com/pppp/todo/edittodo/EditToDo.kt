@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,11 +65,14 @@ fun EditBottomSheet(
         editViewModel(Init(item))
     }
     val state by editViewModel.states.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     LaunchedEffect(state.isVisible) {
         if (state.isVisible) {
             modalBottomSheetState.show()
         } else {
             modalBottomSheetState.hide()
+            keyboardController?.hide()
         }
     }
     BottomSheet(
