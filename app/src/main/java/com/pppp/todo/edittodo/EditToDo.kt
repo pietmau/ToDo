@@ -33,11 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
+import com.pppp.todo.addtodo.Event
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.exaustive
+import com.pppp.todo.main.view.Calendar
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
@@ -128,6 +130,11 @@ fun Content(
                 )
             }
         }
+        Row {
+            Calendar(state.due) {
+                onEvent(EditTodoViewEvent.OnDateTimePicked(it))
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -153,7 +160,7 @@ fun Content(
 @Composable
 @Preview
 @ExperimentalComposeUiApi
-private fun ContentPtreview(onEvent: (MainViewEvent) -> Unit = {}) {
+private fun ContentPreview(onEvent: (MainViewEvent) -> Unit = {}) {
     Content()
 }
 

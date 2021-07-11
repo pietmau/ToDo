@@ -1,28 +1,38 @@
 package com.pppp.todo.main.view
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.runtime.*
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
-import com.pppp.todo.main.viewmodel.MainViewEvent
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.viewmodel.MainViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import com.pppp.todo.main.viewmodel.MainViewState as TodoMainViewModel
 import com.pppp.todo.main.viewmodel.AddToDo.Hidden
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
+import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
+import com.pppp.todo.main.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -36,22 +46,26 @@ fun MainScreen() {
     val editToDoBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     LaunchedEffect(state.addToDo) {
         launch {
             when (state.addToDo) {
-                Hidden -> addToDoBottomSheetState.close(
-                    this,
-                    keyboardController
-                )
+                Hidden -> addToDoBottomSheetState.hide()
                 Showing -> addToDoBottomSheetState.show()
             }.exaustive
         }
     }
-    MainScreenImpl(state) {
-        viewModel(it)
-    }
+    MainScreenImpl(
+        state = state,
+        onEditToDoClicked = {
+            viewModel(OnEditToDoClicked(it))
+        },
+        onAddToDoClicked = {
+            viewModel(OnAddToDoClicked)
+        },
+        onToDoChecked = { id, checked ->
+            viewModel(OnToDoCompleted(id, checked))
+        }
+    )
     AddBottomSheet(state.addToDo == Showing) {
         viewModel(it)
     }
@@ -62,34 +76,23 @@ fun MainScreen() {
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
-private fun ModalBottomSheetState.close(
-    coroutineScope: CoroutineScope,
-    keyboardController: SoftwareKeyboardController?
-) {
-    coroutineScope.launch {
-        hide()
-        // keyboardController?.hide()
-    }
-}
-
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
 @Composable
-private fun MainScreenImpl(mainViewModel: TodoMainViewModel, onEvent: (MainViewEvent) -> Unit) {
-    Box {
-        Scaffold(
-            floatingActionButton = {
-                Fab {
-                    onEvent(OnAddToDoClicked)
-                }
-            },
-            isFloatingActionButtonDocked = true,
-            bottomBar = {
-                BottomAppBar {}
-            }
-        ) {
-            Content(mainViewModel, onEvent)
+private fun MainScreenImpl(
+    state: com.pppp.todo.main.viewmodel.MainViewState,
+    onAddToDoClicked: () -> Unit,
+    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onEditToDoClicked: (String) -> Unit = {}
+) {
+    Scaffold(
+        floatingActionButton = {
+            Fab(onAddToDoClicked)
+        },
+        isFloatingActionButtonDocked = true,
+        bottomBar = {
+            BottomAppBar {}
         }
+    ) {
+        Content(state, onToDoChecked, onEditToDoClicked)
     }
 }
 
@@ -104,11 +107,12 @@ fun Fab(onClick: () -> Unit) {
 
 @Composable
 private fun Content(
-    state: TodoMainViewModel,
-    onEvent: (MainViewEvent) -> Unit = { _ -> }
+    state: com.pppp.todo.main.viewmodel.MainViewState,
+    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onEditToDoClicked: (String) -> Unit = {}
 ) {
     when (state.isLoading) {
-        true -> ListOfToDos(state, onEvent)
+        true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
         else -> Loading()
     }.exaustive
 }

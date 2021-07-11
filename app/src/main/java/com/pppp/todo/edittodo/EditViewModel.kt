@@ -4,11 +4,13 @@ import com.pppp.entities.ToDo
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
+import com.pppp.todo.edittodo.EditTodoViewEvent.OnDateTimePicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.edittodo.OneOffEvents.OnCancel
 import com.pppp.usecases.EditTodoUseCase
-import com.pppp.usecases.Repository
+import com.pppp.usecases.Repository.Companion.DUE
+import com.pppp.usecases.Repository.Companion.TITLE
 import com.pppp.usecases.todolist.GetToDoUseCase
 import com.pppp.usecases.todolist.GetToDoUseCase.Params.GetSingle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +18,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
-import com.pppp.usecases.Repository.Companion.TITLE
-import com.pppp.usecases.Repository.Companion.DUE
 
 @HiltViewModel
 class EditViewModel @Inject constructor(
@@ -35,6 +35,7 @@ class EditViewModel @Inject constructor(
             is OnBackPressed -> finish()
             is OnTextChanged -> emitViewState(state.copy(title = event.text))
             is OnDoneClicked -> onDoneClicked()
+            is OnDateTimePicked -> emitViewState(state.copy(due = event.due))
         }
 
     private fun onInit(toDoToBeEdited: String?) {
@@ -57,6 +58,7 @@ class EditViewModel @Inject constructor(
                 values = state.toValueMap()
             )
         )
+        emitViewState(EditTodoViewState())
     }
 
     private fun finish() {
@@ -77,6 +79,7 @@ sealed class EditTodoViewEvent {
     object OnBackPressed : EditTodoViewEvent()
     object OnDoneClicked : EditTodoViewEvent()
     data class OnTextChanged(val text: String) : EditTodoViewEvent()
+    data class OnDateTimePicked(val due: Long) : EditTodoViewEvent()
 }
 
 sealed class OneOffEvents {

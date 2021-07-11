@@ -13,9 +13,9 @@ import androidx.core.app.NotificationCompat.PRIORITY_HIGH
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.pppp.todo.MainActivity
-import com.pppp.todo.MainActivity.Companion.PENDING_INTENT_REQUEST_CODE
 import com.pppp.todo.R
+import com.pppp.todo.main.MainActivity
+import com.pppp.todo.main.MainActivity.Companion.PENDING_INTENT_REQUEST_CODE
 import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.DUE
 import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.TITLE
 import com.pppp.todo.toDueDateNotificationText

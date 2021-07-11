@@ -1,4 +1,4 @@
-package com.pppp.todo
+package com.pppp.todo.main
 
 import android.os.Bundle
 import android.view.WindowManager

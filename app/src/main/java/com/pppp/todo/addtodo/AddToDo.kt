@@ -7,20 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -50,13 +45,14 @@ import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.toDueDateText
+import com.pppp.todo.toLocalDateTime
 import com.pppp.todo.toMillis
 import com.pppp.uielements.BottomSheet
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-
+import java.time.LocalDateTime
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
@@ -98,7 +94,7 @@ fun AddBottomSheet(
     BottomSheet(
         modalBottomSheetState = modalBottomSheetState,
         onBackPressed = {
-            onEvent(MainViewEvent.OnCancel)
+           viewmodel(Event.OnBackPressed)
         },
     )
     {
@@ -153,7 +149,9 @@ fun AddToDoInputControl(
             )
         }
         Row {
-            Calendar(state, onEvent)
+            Calendar(state.value.due) {
+                onEvent(Event.OnTimeDataPicked(it))
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -178,16 +176,16 @@ fun AddToDoInputControl(
 }
 
 @Composable
-private fun Calendar(
-    state: State<ViewState> = remember {
-        mutableStateOf(ViewState())
-    },
-    onEvent: (Event) -> Unit = {}
+internal fun Calendar(
+    due: Long? = null,
+    onTimeDataPicked: (Long) -> Unit = {}
 ) {
     val dialog = remember { MaterialDialog() }
     dialog.build {
-        datetimepicker {
-            onEvent(Event.OnTimeDataPicked(it.toMillis()))
+        datetimepicker(
+            initialDateTime = due.toLocalDateTime()
+        ) {
+            onTimeDataPicked(it.toMillis())
         }
     }
     Row(
@@ -206,28 +204,10 @@ private fun Calendar(
                 contentDescription = "",
             )
             Text(
-                text = state.value.due?.toDueDateText() ?: "Due",//TODO extract
+                text = due.toDueDateText() ?: "Due",
                 style = MaterialTheme.typography.caption
             )
         }
-    }
-}
-
-@Composable
-private fun DoneButton(onDone: () -> Unit) {
-    Surface(
-        modifier = Modifier
-            .padding(8.dp, 0.dp, 0.dp, 0.dp)
-            .size(32.dp),
-        shape = CircleShape,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
-    ) {
-        Image(
-            imageVector = Icons.Filled.ArrowUpward,
-            contentDescription = "",
-            modifier = Modifier.clickable {
-                onDone()
-            })
     }
 }
 
