@@ -2,6 +2,7 @@ package com.pppp.entities
 
 data class ToDoList(
     val id: String? = null,
+    val name: String,
     val listId: String? = null,
     val created: Long? = null,
     val modified: Long? = null,

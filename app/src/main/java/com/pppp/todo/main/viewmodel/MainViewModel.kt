@@ -12,6 +12,7 @@ import com.pppp.usecases.todos.EditTodoUseCase.Params.Add
 import com.pppp.usecases.todos.EditTodoUseCase.Params.Edit
 import com.pppp.usecases.ToDosRepository.Companion.COMPLETED
 import com.pppp.usecases.todos.GetToDoUseCase
+import com.pppp.usecases.todos.GetToDoUseCase.Params.GetAll
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,7 @@ class MainViewModel @Inject constructor(
 
     init {
         launch {
-            getToDoUseCase().collect {
+            getToDoUseCase(GetAll).collect {
                 emitViewState(mapper(it.filterNot { it.completed == true }))
             }
         }
@@ -45,7 +46,8 @@ class MainViewModel @Inject constructor(
         is OnCancel -> onCancel()
     }
 
-    private fun onCancel() = emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
+    private fun onCancel() =
+        emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
 
     private fun onEditClicked(id: String) = emitViewState(state.copy(itemBeingEdited = id))
 

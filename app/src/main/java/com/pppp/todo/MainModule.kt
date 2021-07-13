@@ -2,15 +2,22 @@ package com.pppp.todo
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.pppp.database.FirebaseListsRepository
 import com.pppp.database.FirebaseToDosRepository
 import com.pppp.entities.ToDo
+import com.pppp.entities.ToDoList
+import com.pppp.todo.drawer.DrawerMapper
+import com.pppp.todo.drawer.ViewState
 import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.main.mapper.Mapper
 import com.pppp.todo.notification.WorkManagerNotificationScheduler
+import com.pppp.usecases.ListsRepository
 import com.pppp.usecases.todos.EditTodoUseCase
 import com.pppp.usecases.ToDosRepository
+import com.pppp.usecases.lists.GetListsUseCase
 import com.pppp.usecases.notification.NotificationScheduler
 import com.pppp.usecases.todos.GetToDoUseCase
 import dagger.Binds
@@ -19,6 +26,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Qualifier
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -35,7 +43,16 @@ abstract class MainModule {
         fun provideRepository(): ToDosRepository = FirebaseToDosRepository(Firebase.firestore)
 
         @Provides
-        fun toDoListUseCase(toDosRepository: ToDosRepository): GetToDoUseCase = GetToDoUseCase(toDosRepository)
+        fun provideFirebaseListsRepository(): ListsRepository =
+            FirebaseListsRepository(Firebase.firestore)
+
+        @Provides
+        fun toDoListUseCase(toDosRepository: ToDosRepository): GetToDoUseCase =
+            GetToDoUseCase(toDosRepository)
+
+        @Provides
+        fun listsUseCase(listsRepository: ListsRepository): GetListsUseCase =
+            GetListsUseCase(listsRepository)
 
         @Provides
         fun editToDoUseCase(
@@ -46,5 +63,17 @@ abstract class MainModule {
         @Provides
         fun workManager(@ApplicationContext context: Context): WorkManager =
             WorkManager.getInstance(context)
+
+        @Provides
+        @UserId
+        fun provideUserId(): String = requireNotNull(FirebaseAuth.getInstance().currentUser?.uid)
+
+        @Provides
+        fun provideDrawerMapper(): @JvmSuppressWildcards (List<ToDoList>) -> ViewState =
+            DrawerMapper()
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UserId

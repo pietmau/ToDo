@@ -1,7 +1,5 @@
 package com.pppp.todo.drawer
 
-import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,79 +9,48 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.entities.ToDoList
 
 @Composable
-fun AppDrawer(
-    currentRoute: String,
-    navigateToHome: () -> Unit,
-    navigateToInterests: () -> Unit,
-    closeDrawer: () -> Unit
+fun Drawer(
+    currentRoute: String = "",
+    closeDrawer: () -> Unit = {},
+    toDoLists: List<ToDoList> = emptyList()
 ) {
+    val viewModel = viewModel<DrawerViewModel>()
 
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(Modifier.height(24.dp))
-        JetNewsLogo(Modifier.padding(16.dp))
         Divider(color = MaterialTheme.colors.onSurface.copy(alpha = .2f))
-        DrawerButton(
-            icon = Icons.Filled.Home,
-            label = "Home",
-            isSelected = currentRoute == MainDestinations.HOME_ROUTE,
-            action = {
-                navigateToHome()
-                closeDrawer()
+        LazyColumn {
+            items(toDoLists) {
+                DrawerButton(
+                    label = it.name,
+                    isSelected = true,
+                    action = {
+                        closeDrawer()
+                    }
+                )
             }
-        )
-
-        DrawerButton(
-            icon = Icons.Filled.ListAlt,
-            label = "Interests",
-            isSelected = currentRoute == MainDestinations.INTERESTS_ROUTE,
-            action = {
-                navigateToInterests()
-                closeDrawer()
-            }
-        )
-    }
-}
-
-@Composable
-private fun JetNewsLogo(modifier: Modifier = Modifier) {
-    Row(modifier = modifier) {
-        Image(
-            painter = painterResource(R.drawable.ic_jetnews_logo),
-            contentDescription = null, // decorative
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
-        )
-        Spacer(Modifier.width(8.dp))
-        Image(
-            painter = painterResource(R.drawable.ic_jetnews_wordmark),
-            contentDescription = stringResource(R.string.app_name),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface)
-        )
+        }
     }
 }
 
 @Composable
 private fun DrawerButton(
-    icon: ImageVector,
     label: String,
     isSelected: Boolean,
     action: () -> Unit,
@@ -123,12 +90,6 @@ private fun DrawerButton(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    imageVector = icon,
-                    contentDescription = null, // decorative
-                    colorFilter = ColorFilter.tint(textIconColor),
-                    alpha = imageAlpha
-                )
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
@@ -136,22 +97,6 @@ private fun DrawerButton(
                     color = textIconColor
                 )
             }
-        }
-    }
-}
-
-@Preview("Drawer contents")
-@Preview("Drawer contents (dark)", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun PreviewAppDrawer() {
-    JetnewsTheme {
-        Surface {
-            AppDrawer(
-                currentRoute = MainDestinations.HOME_ROUTE,
-                navigateToHome = {},
-                navigateToInterests = {},
-                closeDrawer = { }
-            )
         }
     }
 }

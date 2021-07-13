@@ -1,17 +1,17 @@
 package com.pppp.usecases
 
-import com.pppp.entities.ToDo
 import com.pppp.entities.ToDoList
 import kotlinx.coroutines.flow.Flow
 
 interface ListsRepository {
-    suspend fun getLists(): Flow<List<ToDoList>>
+    suspend fun getLists(userId: String): Flow<List<ToDoList>>
 
-    suspend fun addList(toDoList: ToDoList): String
+    suspend fun addList(userId: String, toDoList: ToDoList): String
 
     suspend fun editList(toDoList: ToDoList): String
 
     companion object {
+        const val NAME = "name"
         const val ID = "id"
         const val USERS = "users"
         const val LISTS = "lists"

@@ -12,6 +12,7 @@ import com.pppp.usecases.ListsRepository.Companion.ID
 import com.pppp.usecases.ListsRepository.Companion.LISTS
 import com.pppp.usecases.ListsRepository.Companion.LIST_ID
 import com.pppp.usecases.ListsRepository.Companion.MODIFIED
+import com.pppp.usecases.ListsRepository.Companion.NAME
 import com.pppp.usecases.ListsRepository.Companion.PRIORITY
 import com.pppp.usecases.ListsRepository.Companion.USERS
 import kotlinx.coroutines.channels.awaitClose
@@ -22,10 +23,9 @@ import kotlin.coroutines.suspendCoroutine
 
 class FirebaseListsRepository(
     private val db: FirebaseFirestore,
-    private val userId: String,
 ) : ListsRepository {
 
-    override suspend fun getLists(): Flow<List<ToDoList>> =
+    override suspend fun getLists(userId: String): Flow<List<ToDoList>> =
         callbackFlow {
             val registration = db.collection(USERS).document(userId).collection(LISTS)
                 .addSnapshotListener { value, error ->
@@ -40,7 +40,7 @@ class FirebaseListsRepository(
             }
         }
 
-    override suspend fun addList(toDoList: ToDoList): String =
+    override suspend fun addList(userId: String, toDoList: ToDoList): String =
         suspendCoroutine { continuation ->
             db.runTransaction { transaction ->
                 val collection =
@@ -69,7 +69,8 @@ private fun QuerySnapshot?.toLists(): List<ToDoList> =
 private fun DocumentSnapshot.toList(): ToDoList =
     ToDoList(
         id = id,
-        listId = requireNotNull(this.getString(LIST_ID)),
+        name = requireNotNull(getString(NAME)),
+        listId = requireNotNull(getString(LIST_ID)),
         created = getLong(CREATED),
         modified = getLong(MODIFIED),
         archived = getBoolean(ARCHIVED) ?: false,

@@ -24,6 +24,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Hidden
@@ -90,7 +91,8 @@ private fun MainScreenImpl(
         isFloatingActionButtonDocked = true,
         bottomBar = {
             BottomAppBar {}
-        }
+        },
+        drawerContent = { Drawer() }
     ) {
         Content(state, onToDoChecked, onEditToDoClicked)
     }
