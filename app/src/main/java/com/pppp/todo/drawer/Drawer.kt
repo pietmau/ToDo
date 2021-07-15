@@ -16,27 +16,31 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pppp.entities.ToDoList
 
 @Composable
 fun Drawer(
     currentRoute: String = "",
     closeDrawer: () -> Unit = {},
-    toDoLists: List<ToDoList> = emptyList()
+    state: State<ViewState> = viewModel<DrawerViewModel>().states.collectAsState()
 ) {
-    val viewModel = viewModel<DrawerViewModel>()
-
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(Modifier.height(24.dp))
         Divider(color = MaterialTheme.colors.onSurface.copy(alpha = .2f))
         LazyColumn {
-            items(toDoLists) {
+            items(state.value.lists) {
                 DrawerButton(
                     label = it.name,
                     isSelected = true,
@@ -99,4 +103,12 @@ private fun DrawerButton(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun DrawerPreview() {
+    val state =
+        remember { mutableStateOf(ViewState(lists = listOf(ViewState.ToDoList(name = "Foo")))) }
+    Drawer(state = state)
 }

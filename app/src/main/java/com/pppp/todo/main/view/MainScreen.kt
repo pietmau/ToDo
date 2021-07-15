@@ -10,15 +10,23 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -33,6 +41,7 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
 import com.pppp.todo.main.viewmodel.MainViewModel
+import com.pppp.todo.main.viewmodel.MainViewState
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
@@ -79,12 +88,15 @@ fun MainScreen() {
 @ExperimentalMaterialApi
 @Composable
 private fun MainScreenImpl(
-    state: com.pppp.todo.main.viewmodel.MainViewState,
+    state: MainViewState,
     onAddToDoClicked: () -> Unit,
     onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
     onEditToDoClicked: (String) -> Unit = {}
 ) {
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
+        scaffoldState = scaffoldState,
         floatingActionButton = {
             Fab(onAddToDoClicked)
         },
@@ -92,9 +104,28 @@ private fun MainScreenImpl(
         bottomBar = {
             BottomAppBar {}
         },
-        drawerContent = { Drawer() }
+        drawerContent = { Drawer() },
+        topBar = {
+            TopAppBar {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            onDrawerClicked(scaffoldState)
+                        }
+                    },
+                    content = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) })
+            }
+        }
     ) {
         Content(state, onToDoChecked, onEditToDoClicked)
+    }
+}
+
+suspend fun onDrawerClicked(scaffoldState: ScaffoldState) {
+    if (scaffoldState.drawerState.isOpen) {
+        scaffoldState.drawerState.close()
+    } else {
+        scaffoldState.drawerState.open()
     }
 }
 
@@ -109,7 +140,7 @@ fun Fab(onClick: () -> Unit) {
 
 @Composable
 private fun Content(
-    state: com.pppp.todo.main.viewmodel.MainViewState,
+    state: MainViewState,
     onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
     onEditToDoClicked: (String) -> Unit = {}
 ) {

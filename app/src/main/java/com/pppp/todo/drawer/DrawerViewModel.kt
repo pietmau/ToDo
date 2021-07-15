@@ -17,8 +17,11 @@ class DrawerViewModel @Inject constructor(
     private val todoListsUseCase: GetListsUseCase,
     @UserId private val userId: String,
     private val mapper: @JvmSuppressWildcards (List<ToDoList>) -> ViewState
-) :
-    GenericViewModelWithOneOffEvents<ViewState, Event, OneOffEvent>() {
+) : GenericViewModelWithOneOffEvents<ViewState, Event, OneOffEvent>() {
+
+    override val _uiStates = MutableStateFlow(ViewState())
+
+    override val _oneOffEvents = MutableSharedFlow<OneOffEvent>()
 
     init {
         viewModelScope.launch {
@@ -27,14 +30,6 @@ class DrawerViewModel @Inject constructor(
             }
         }
     }
-
-    private fun foo() {
-
-    }
-
-    override val _uiStates = MutableStateFlow(ViewState())
-
-    override val _oneOffEvents = MutableSharedFlow<OneOffEvent>()
 
     override fun invoke(event: Event) {
 
