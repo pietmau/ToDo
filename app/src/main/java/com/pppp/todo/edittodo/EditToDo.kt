@@ -32,7 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pppp.entities.ToDo
 import com.pppp.todo.R
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
@@ -40,6 +39,7 @@ import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.view.Calendar
+import com.pppp.todo.main.viewmodel.ItemBeingEdited
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.collect
 @ExperimentalMaterialApi
 @Composable
 fun EditBottomSheet(
-        item: ToDo? = null,
+        item: ItemBeingEdited = ItemBeingEdited.None,
         modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
                 ModalBottomSheetValue.Hidden
         ),
@@ -64,7 +64,12 @@ fun EditBottomSheet(
         }
     }
     LaunchedEffect(item) {
-        editViewModel(Init(item))
+        if (item is ItemBeingEdited.Some) {
+            editViewModel(
+                    Init(
+                            itemId = item.itemId,
+                            listId = item.listId))
+        }
     }
     val state by editViewModel.states.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current

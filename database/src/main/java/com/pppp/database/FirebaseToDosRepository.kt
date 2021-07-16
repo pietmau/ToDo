@@ -39,18 +39,6 @@ class FirebaseToDosRepository(private val db: FirebaseFirestore) : ToDosReposito
                 }
             }
 
-    @ExperimentalCoroutinesApi
-    override fun getToDo(id: String): Flow<List<ToDo>> =
-            callbackFlow {
-                db.collection(TODOS).document(id).get()
-                        .addOnSuccessListener { value: DocumentSnapshot ->
-                            trySend(listOfNotNull(value.toToDo()))
-                        }
-                awaitClose {
-                    /* NoOp */
-                }
-            }
-
     override suspend fun addToDo(params: ToDosRepository.Params.Add): String =
             suspendCoroutine { continuation ->
                 listReference(userId = params.userId, listId = params.listId).add(
@@ -74,6 +62,10 @@ class FirebaseToDosRepository(private val db: FirebaseFirestore) : ToDosReposito
                     continuation.resume(params.itemId)
                 }
             }
+
+    override fun getToDo(params: ToDosRepository.Params.GetSingle): Flow<List<ToDo>> {
+        TODO("not implemented")
+    }
 
     private fun listReference(userId: String, listId: String): CollectionReference =
             db.collection(USERS).document(userId).collection(LISTS).document(listId).collection(TODOS)

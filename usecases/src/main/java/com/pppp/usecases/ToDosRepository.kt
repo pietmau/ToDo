@@ -9,13 +9,14 @@ interface ToDosRepository {
 
     suspend fun edit(params: Params.Edit): String
 
-    fun getToDo(id: String): Flow<List<ToDo>>
+    fun getToDo(params: Params.GetSingle): Flow<List<ToDo>>
 
     fun getList(userId: String, listId: String): Flow<List<ToDo>>
 
     sealed class Params {
         data class Add(val userId: String, val listId: String, val title: String, val due: Long? = null)
         data class Edit(val userId: String, val listId: String, val itemId: String, val values: Map<String, Any?>)
+        data class GetSingle(val userId: String, val listId: String, val itemId: String)
     }
 
     companion object {

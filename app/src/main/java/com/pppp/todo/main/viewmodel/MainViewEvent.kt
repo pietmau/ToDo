@@ -6,7 +6,7 @@ sealed class MainViewEvent {
 
     data class GetList(val toDoList: String) : MainViewEvent()
 
-    data class OnEditToDoClicked(val id: String) : MainViewEvent()
+    data class OnEditToDoClicked(val itemId: String, val listId: String) : MainViewEvent()
 
     object OnAddToDoClicked : MainViewEvent()
 

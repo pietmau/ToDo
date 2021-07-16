@@ -16,25 +16,27 @@ interface Consumer<T> {
 }
 
 fun Long?.toDueDateText(): String? =
-    if (this != null && this > 0) {
-        SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(this))
-    } else {
-        "Due"
-    }
+        if (this != null && this > 0) {
+            SimpleDateFormat("dd MMM", Locale.getDefault()).format(Date(this))
+        } else {
+            "Due"
+        }
 
 fun LocalDateTime.toMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 fun Long?.toLocalDateTime(): LocalDateTime =
-    this?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault()) } ?: LocalDateTime.now()
+        this?.let { LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault()) }
+                ?: LocalDateTime.now()
 
 fun Long.toDueDateNotificationText() =
-    SimpleDateFormat("EEE, dd MMMM HH:mm", Locale.getDefault()).format(Date(this))
+        SimpleDateFormat("EEE, dd MMMM HH:mm", Locale.getDefault()).format(Date(this))
 
 fun ToDo.toDoViewModel() = ToDoViewModel(
-    id = id!!,
-    title = title,
-    starred = starred,
-    due = due
+        listId = listId,
+        id = id!!,
+        title = title,
+        starred = starred,
+        due = due
 )
 
 fun Long.calculateDelay() = this - LocalDateTime.now().toMillis()

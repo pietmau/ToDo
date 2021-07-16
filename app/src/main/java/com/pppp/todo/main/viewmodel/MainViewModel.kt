@@ -34,7 +34,7 @@ class MainViewModel @Inject constructor(
                 is OnToDoAdded -> addToDo(event.title, event.due)
                 is OnToDoCompleted -> completeToDo(event.listId, event.itemId, event.completed)
                 is OnAddToDoClicked -> onAddToDoClicked()
-                is OnEditToDoClicked -> onEditClicked(event.id)
+                is OnEditToDoClicked -> onEditClicked(event.listId, event.itemId)
                 is OnCancel -> onCancel()
                 is MainViewEvent.GetList -> getList(user.id, event.toDoList)
             }
@@ -49,9 +49,10 @@ class MainViewModel @Inject constructor(
     }
 
     private fun onCancel() =
-            emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
+            emitViewState(state.copy(itemBeingEdited = ItemBeingEdited.None, addToDo = AddToDo.Hidden))
 
-    private fun onEditClicked(id: String) = emitViewState(state.copy(itemBeingEdited = id))
+    private fun onEditClicked(listId: String, itemId: String) =
+            emitViewState(state.copy(itemBeingEdited = ItemBeingEdited.Some(listId = listId, itemId = itemId)))
 
     private fun onAddToDoClicked() = emitViewState(state.copy(addToDo = AddToDo.Showing))
 

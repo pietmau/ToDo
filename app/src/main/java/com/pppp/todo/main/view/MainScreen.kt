@@ -14,12 +14,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -40,7 +38,6 @@ import com.pppp.todo.main.viewmodel.AddToDo.Showing
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
 import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.MainViewState
 import kotlinx.coroutines.launch
@@ -70,14 +67,14 @@ fun MainScreen(listId: String = "") {
     }
     MainScreenImpl(
             state = state,
-            onEditToDoClicked = {
-                viewModel(OnEditToDoClicked(it))
+            onEditToDoClicked = { listId, itemId ->
+                viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
             },
             onAddToDoClicked = {
                 viewModel(OnAddToDoClicked)
             },
             onToDoChecked = { id, checked ->
-               // viewModel(OnToDoCompleted(id, checked))
+                // viewModel(OnToDoCompleted(id, checked))
             }
     )
     AddBottomSheet(state.addToDo == Showing) {
@@ -95,7 +92,7 @@ private fun MainScreenImpl(
         state: MainViewState,
         onAddToDoClicked: () -> Unit,
         onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
-        onEditToDoClicked: (String) -> Unit = {}
+        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -146,7 +143,7 @@ fun Fab(onClick: () -> Unit) {
 private fun Content(
         state: MainViewState,
         onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
-        onEditToDoClicked: (String) -> Unit = {}
+        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     when (state.isLoading) {
         true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
