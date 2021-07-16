@@ -3,12 +3,14 @@ package com.pppp.todo
 import android.content.Context
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pppp.database.FirebaseListsRepository
 import com.pppp.database.FirebaseToDosRepository
 import com.pppp.entities.ToDo
 import com.pppp.entities.ToDoList
+import com.pppp.entities.User
 import com.pppp.todo.drawer.DrawerMapper
 import com.pppp.todo.drawer.ViewState
 import com.pppp.todo.main.viewmodel.MainViewState
@@ -44,25 +46,25 @@ abstract class MainModule {
 
         @Provides
         fun provideFirebaseListsRepository(): ListsRepository =
-            FirebaseListsRepository(Firebase.firestore)
+                FirebaseListsRepository(Firebase.firestore)
 
         @Provides
         fun toDoListUseCase(toDosRepository: ToDosRepository): GetToDoUseCase =
-            GetToDoUseCase(toDosRepository)
+                GetToDoUseCase(toDosRepository)
 
         @Provides
         fun listsUseCase(listsRepository: ListsRepository): GetListsUseCase =
-            GetListsUseCase(listsRepository)
+                GetListsUseCase(listsRepository)
 
         @Provides
         fun editToDoUseCase(
-            toDosRepository: ToDosRepository,
-            notificationScheduler: NotificationScheduler
+                toDosRepository: ToDosRepository,
+                notificationScheduler: NotificationScheduler
         ): EditTodoUseCase = EditTodoUseCase(toDosRepository, notificationScheduler)
 
         @Provides
         fun workManager(@ApplicationContext context: Context): WorkManager =
-            WorkManager.getInstance(context)
+                WorkManager.getInstance(context)
 
         @Provides
         @UserId
@@ -70,7 +72,10 @@ abstract class MainModule {
 
         @Provides
         fun provideDrawerMapper(): @JvmSuppressWildcards (List<ToDoList>) -> ViewState =
-            DrawerMapper()
+                DrawerMapper()
+
+        @Provides
+        fun provideUser(): User = User(Firebase.auth.currentUser?.uid!!)
     }
 }
 

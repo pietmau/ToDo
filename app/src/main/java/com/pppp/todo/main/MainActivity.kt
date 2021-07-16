@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    MainScreen()
+                    MainScreen("m7nagiQ0KWgCg2Cj61Ho")
                 }
             }
         }

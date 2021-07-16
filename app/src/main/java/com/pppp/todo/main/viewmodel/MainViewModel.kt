@@ -1,18 +1,15 @@
 package com.pppp.todo.main.viewmodel
 
 import com.pppp.entities.ToDo
+import com.pppp.entities.User
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoCompleted
+import com.pppp.todo.main.viewmodel.MainViewEvent.*
+import com.pppp.usecases.ToDosRepository.Companion.COMPLETED
 import com.pppp.usecases.todos.EditTodoUseCase
 import com.pppp.usecases.todos.EditTodoUseCase.Params.Add
 import com.pppp.usecases.todos.EditTodoUseCase.Params.Edit
-import com.pppp.usecases.ToDosRepository.Companion.COMPLETED
 import com.pppp.usecases.todos.GetToDoUseCase
-import com.pppp.usecases.todos.GetToDoUseCase.Params.GetAll
+import com.pppp.usecases.todos.GetToDoUseCase.Params.GetList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,44 +18,55 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val editTodoUseCase: EditTodoUseCase,
-    private val getToDoUseCase: GetToDoUseCase,
-    private val mapper: @JvmSuppressWildcards (List<ToDo>) -> MainViewState
+        private val editTodoUseCase: EditTodoUseCase,
+        private val getToDoUseCase: GetToDoUseCase,
+        private val mapper: @JvmSuppressWildcards (List<ToDo>) -> MainViewState,
+        private val user: User
 ) : GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent>() {
+    private lateinit var listId: String
 
     override val _uiStates = MutableStateFlow(MainViewState())
 
     override val _oneOffEvents = MutableSharedFlow<OneOffEvent>()
 
-    init {
+    override fun invoke(event: MainViewEvent) =
+            when (event) {
+                is OnToDoAdded -> addToDo(event.title, event.due)
+                is OnToDoCompleted -> completeToDo(event.listId, event.itemId, event.completed)
+                is OnAddToDoClicked -> onAddToDoClicked()
+                is OnEditToDoClicked -> onEditClicked(event.id)
+                is OnCancel -> onCancel()
+                is MainViewEvent.GetList -> getList(user.id, event.toDoList)
+            }
+
+    private fun getList(userId: String, listId: String) {
+        this.listId = listId
         launch {
-            getToDoUseCase(GetAll).collect {
+            getToDoUseCase(GetList(userId, listId)).collect {
                 emitViewState(mapper(it.filterNot { it.completed == true }))
             }
         }
     }
 
-    override fun invoke(event: MainViewEvent) = when (event) {
-        is OnToDoAdded -> addToDo(event.title, event.due)
-        is OnToDoCompleted -> completeToDo(event.id, event.completed)
-        is OnAddToDoClicked -> onAddToDoClicked()
-        is OnEditToDoClicked -> onEditClicked(event.id)
-        is OnCancel -> onCancel()
-    }
-
     private fun onCancel() =
-        emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
+            emitViewState(state.copy(itemBeingEdited = null, addToDo = AddToDo.Hidden))
 
     private fun onEditClicked(id: String) = emitViewState(state.copy(itemBeingEdited = id))
 
     private fun onAddToDoClicked() = emitViewState(state.copy(addToDo = AddToDo.Showing))
 
-    private fun completeToDo(id: String, completed: Boolean) = launch {
-        editTodoUseCase(Edit(id, mapOf(COMPLETED to completed)))
-    }
+    private fun completeToDo(listId: String, itemId: String, completed: Boolean) =
+            launch {
+                editTodoUseCase(
+                        Edit(
+                                userId = user.id,
+                                listId = listId,
+                                itemId = itemId,
+                                values = mapOf(COMPLETED to completed)))
+            }
 
-    private fun addToDo(title: String, due: Long?) = launch {
-        editTodoUseCase(Add(title = title, due = due))
-
-    }
+    private fun addToDo(title: String, due: Long?) =
+            launch {
+                editTodoUseCase(Add(userId = user.id, listId = listId, title = title, due = due))
+            }
 }

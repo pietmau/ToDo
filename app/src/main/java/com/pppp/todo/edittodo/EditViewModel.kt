@@ -1,6 +1,7 @@
 package com.pppp.todo.edittodo
 
 import com.pppp.entities.ToDo
+import com.pppp.entities.User
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
@@ -12,51 +13,40 @@ import com.pppp.usecases.todos.EditTodoUseCase
 import com.pppp.usecases.ToDosRepository.Companion.DUE
 import com.pppp.usecases.ToDosRepository.Companion.TITLE
 import com.pppp.usecases.todos.GetToDoUseCase
-import com.pppp.usecases.todos.GetToDoUseCase.Params.GetSingle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 @HiltViewModel
 class EditViewModel @Inject constructor(
-    private val getToDoUseCase: GetToDoUseCase,
-    private val editTodoUseCase: EditTodoUseCase
+        private val getToDoUseCase: GetToDoUseCase,
+        private val editTodoUseCase: EditTodoUseCase,
+        private val user: User
 ) : GenericViewModelWithOneOffEvents<EditTodoViewState, EditTodoViewEvent, OneOffEvents>() {
+    private lateinit var currentItem: ToDo
 
     override val _uiStates = MutableStateFlow(EditTodoViewState())
 
     override val _oneOffEvents = MutableSharedFlow<OneOffEvents>()
 
     override fun invoke(event: EditTodoViewEvent) =
-        when (event) {
-            is Init -> onInit(event.toDoToBeEdited)
-            is OnBackPressed -> finish()
-            is OnTextChanged -> emitViewState(state.copy(title = event.text))
-            is OnDoneClicked -> onDoneClicked()
-            is OnDateTimePicked -> emitViewState(state.copy(due = event.due))
-        }
-
-    private fun onInit(toDoToBeEdited: String?) {
-        if (toDoToBeEdited != null) {
-            launch {
-                getToDoUseCase.invoke(GetSingle(toDoToBeEdited))
-                    .collect {
-                        it.firstOrNull()?.let { emitViewState(it.toViewState()) }
-                    }
+            when (event) {
+                is Init -> emitViewState(event.toDo.toViewState())
+                is OnBackPressed -> finish()
+                is OnTextChanged -> emitViewState(state.copy(title = event.text))
+                is OnDoneClicked -> onDoneClicked()
+                is OnDateTimePicked -> emitViewState(state.copy(due = event.due))
             }
-        } else {
-            emitViewState(EditTodoViewState())
-        }
-    }
 
     private fun onDoneClicked() = launch {
         editTodoUseCase.invoke(
-            EditTodoUseCase.Params.Edit(
-                id = state.id,
-                values = state.toValueMap()
-            )
+                EditTodoUseCase.Params.Edit(
+                        itemId = state.id,
+                        values = state.toValueMap(),
+                        userId = user.id,
+                        listId = currentItem.listId
+                )
         )
         emitViewState(EditTodoViewState())
     }
@@ -68,14 +58,14 @@ class EditViewModel @Inject constructor(
 }
 
 data class EditTodoViewState(
-    val isVisible: Boolean = false,
-    val id: String = "",
-    val title: String = "",
-    val due: Long? = null
+        val isVisible: Boolean = false,
+        val id: String = "",
+        val title: String = "",
+        val due: Long? = null
 )
 
 sealed class EditTodoViewEvent {
-    data class Init(val toDoToBeEdited: String?) : EditTodoViewEvent()
+    data class Init(val toDo: ToDo?) : EditTodoViewEvent()
     object OnBackPressed : EditTodoViewEvent()
     object OnDoneClicked : EditTodoViewEvent()
     data class OnTextChanged(val text: String) : EditTodoViewEvent()
@@ -86,12 +76,14 @@ sealed class OneOffEvents {
     object OnCancel : OneOffEvents()
 }
 
-private fun ToDo.toViewState(): EditTodoViewState =
-    EditTodoViewState(
-        isVisible = id != null,
-        id = id!!,
-        title = title,
-        due = due
-    )
+private fun ToDo?.toViewState(): EditTodoViewState =
+        this?.let {
+            EditTodoViewState(
+                    isVisible = id != null,
+                    id = id!!,
+                    title = title,
+                    due = due
+            )
+        } ?: EditTodoViewState()
 
 private fun EditTodoViewState.toValueMap(): Map<String, Any?> = mapOf(TITLE to title, DUE to due)
