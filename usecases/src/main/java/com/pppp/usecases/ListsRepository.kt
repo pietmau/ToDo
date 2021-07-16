@@ -15,7 +15,7 @@ interface ListsRepository {
         const val ID = "id"
         const val USERS = "users"
         const val LISTS = "lists"
-        const val LIST_ID = "list_id"
+        const val LIST_ID = "listId"
         const val PRIORITY = "priority"
         const val DELETED = "deleted"
         const val ARCHIVED = "archived"

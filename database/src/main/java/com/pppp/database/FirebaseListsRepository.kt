@@ -22,41 +22,31 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class FirebaseListsRepository(
-    private val db: FirebaseFirestore,
+        private val db: FirebaseFirestore,
 ) : ListsRepository {
 
     override suspend fun getLists(userId: String): Flow<List<ToDoList>> =
-        callbackFlow {
-            val registration = db.collection(USERS).document(userId).collection(LISTS)
-                .addSnapshotListener { value, error ->
-                    if (error != null) {
-                        close(error)
-                    } else {
-                        trySend(value.toLists())
-                    }
+            callbackFlow {
+                val registration = db.collection(USERS).document(userId).collection(LISTS)
+                        .addSnapshotListener { value, error ->
+                            if (error != null) {
+                                close(error)
+                            } else {
+                                trySend(value.toLists())
+                            }
+                        }
+                awaitClose {
+                    registration.remove()
                 }
-            awaitClose {
-                registration.remove()
             }
-        }
 
     override suspend fun addList(userId: String, toDoList: ToDoList): String =
-        suspendCoroutine { continuation ->
-            db.runTransaction { transaction ->
-                val collection =
-                    db.collection(USERS).document(userId).collection(LISTS)
-                collection.add(toDoList)
-                    .addOnSuccessListener { docRef ->
-                        db.runTransaction { transaction ->
-                            transaction.update(
-                                docRef,
-                                mapOf((ID to docRef.id), (LIST_ID to docRef.id))
-                            )
-                        }
-                        continuation.resume(docRef.id)
-                    }
+            suspendCoroutine { continuation ->
+                db.runTransaction { transaction ->
+                    val collection = db.collection(USERS).document(userId).collection(LISTS)
+                    collection.add(toDoList)
+                }
             }
-        }
 
     override suspend fun editList(toDoList: ToDoList): String {
         TODO("Not yet implemented")
@@ -64,16 +54,15 @@ class FirebaseListsRepository(
 }
 
 private fun QuerySnapshot?.toLists(): List<ToDoList> =
-    this?.documents?.map { it.toList() }?.sortedBy { it.priority } ?: emptyList()
+        this?.documents?.map { it.toList() }?.sortedBy { it.priority } ?: emptyList()
 
 private fun DocumentSnapshot.toList(): ToDoList =
-    ToDoList(
-        id = id,
-        name = requireNotNull(getString(NAME)),
-        listId = requireNotNull(getString(LIST_ID)),
-        created = getLong(CREATED),
-        modified = getLong(MODIFIED),
-        archived = getBoolean(ARCHIVED) ?: false,
-        deleted = getBoolean(DELETED) ?: false,
-        priority = getLong(PRIORITY) ?: 0
-    )
+        ToDoList(
+                id = id,
+                name = requireNotNull(getString(NAME)),
+                created = getLong(CREATED),
+                modified = getLong(MODIFIED),
+                archived = getBoolean(ARCHIVED) ?: false,
+                deleted = getBoolean(DELETED) ?: false,
+                priority = getLong(PRIORITY) ?: 0
+        )
