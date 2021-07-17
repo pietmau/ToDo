@@ -9,7 +9,7 @@ interface ToDosRepository {
 
     suspend fun edit(params: Params.Edit): String
 
-    fun getToDo(params: Params.GetSingle): Flow<List<ToDo>>
+    suspend fun getToDo(params: Params.GetSingle): Flow<List<ToDo>>
 
     fun getList(userId: String, listId: String): Flow<List<ToDo>>
 
