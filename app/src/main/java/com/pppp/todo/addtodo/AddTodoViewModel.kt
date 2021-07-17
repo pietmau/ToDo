@@ -32,7 +32,7 @@ class AddTodoViewModel @Inject constructor() :
         emitOneOffEvent(OneOffEvent.OnBackPressed)
     }
 
-    private fun onTimeDataPicked(due: Long) =
+    private fun onTimeDataPicked(due: Long?) =
         emitViewState(state.copy(due = due))
 
     private fun onTitleChanged(event: OnTitleChanged) =
@@ -62,7 +62,7 @@ sealed class Event {
     object DoneClicked : Event()
     object OnBackPressed : Event()
     data class OnTitleChanged(val title: String) : Event()
-    data class OnTimeDataPicked(val due: Long) : Event()
+    data class OnTimeDataPicked(val due: Long?) : Event()
 }
 
 sealed class OneOffEvent {

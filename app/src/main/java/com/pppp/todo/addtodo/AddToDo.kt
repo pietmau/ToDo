@@ -16,6 +16,7 @@ import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -94,7 +95,7 @@ fun AddBottomSheet(
     BottomSheet(
         modalBottomSheetState = modalBottomSheetState,
         onBackPressed = {
-           viewmodel(Event.OnBackPressed)
+            viewmodel(Event.OnBackPressed)
         },
     )
     {
@@ -178,7 +179,7 @@ fun AddToDoInputControl(
 @Composable
 internal fun Calendar(
     due: Long? = null,
-    onTimeDataPicked: (Long) -> Unit = {}
+    onTimeDataPicked: (Long?) -> Unit = {}
 ) {
     val dialog = remember { MaterialDialog() }
     dialog.build {
@@ -190,22 +191,30 @@ internal fun Calendar(
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable {
-                dialog.show()
-            }
-            .padding(all = 8.dp)
+        modifier = Modifier.padding(all = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
+                modifier = Modifier
+                    .clickable {
+                        dialog.show()
+                    },
                 imageVector = Icons.Outlined.DateRange,
                 contentDescription = "",
             )
             Text(
                 text = due.toDueDateText() ?: "Due",
                 style = MaterialTheme.typography.caption
+            )
+            Image(
+                modifier = Modifier
+                    .clickable {
+                        onTimeDataPicked(null)
+                    },
+                imageVector = Icons.Outlined.Close,
+                contentDescription = "",
             )
         }
     }
