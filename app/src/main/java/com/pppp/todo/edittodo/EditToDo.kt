@@ -49,11 +49,11 @@ import kotlinx.coroutines.flow.collect
 @ExperimentalMaterialApi
 @Composable
 fun EditBottomSheet(
-        item: ItemBeingEdited = ItemBeingEdited.None,
-        modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-                ModalBottomSheetValue.Hidden
-        ),
-        onEvent: (MainViewEvent) -> Unit = {}
+    item: ItemBeingEdited = ItemBeingEdited.None,
+    modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+        ModalBottomSheetValue.Hidden
+    ),
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
     val editViewModel = viewModel<EditViewModel>()
     LaunchedEffect(editViewModel, onEvent) {
@@ -66,9 +66,11 @@ fun EditBottomSheet(
     LaunchedEffect(item) {
         if (item is ItemBeingEdited.Some) {
             editViewModel(
-                    Init(
-                            itemId = item.itemId,
-                            listId = item.listId))
+                Init(
+                    itemId = item.itemId,
+                    listId = item.listId
+                )
+            )
         }
     }
     val state by editViewModel.states.collectAsState()
@@ -83,55 +85,55 @@ fun EditBottomSheet(
         }
     }
     BottomSheet(
-            onBackPressed = {
-                editViewModel(OnBackPressed)
-            },
-            content = {
-                Content(
-                        state = state
-                ) {
-                    editViewModel(it)
-                }
-            },
-            modalBottomSheetState = modalBottomSheetState
+        onBackPressed = {
+            editViewModel(OnBackPressed)
+        },
+        content = {
+            Content(
+                state = state
+            ) {
+                editViewModel(it)
+            }
+        },
+        modalBottomSheetState = modalBottomSheetState
     )
 }
 
 @ExperimentalComposeUiApi
 @Composable
 fun Content(
-        state: EditTodoViewState = remember {
-            mutableStateOf(EditTodoViewState())
-        }.value,
-        onEvent: (EditTodoViewEvent) -> Unit = {}
+    state: EditTodoViewState = remember {
+        mutableStateOf(EditTodoViewState())
+    }.value,
+    onEvent: (EditTodoViewEvent) -> Unit = {}
 ) {
     Column(
-            modifier = Modifier.padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 8.dp
-            )
+        modifier = Modifier.padding(
+            start = 16.dp,
+            end = 16.dp,
+            top = 16.dp,
+            bottom = 8.dp
+        )
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TextField(
-                        modifier = Modifier
-                                .weight(1F)
-                                .onKeyEvent {
-                                    if (it.key.keyCode == Key.Back.keyCode) {
-                                        onEvent(OnBackPressed)
-                                    }
-                                    true
-                                },
-                        keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { onEvent(OnDoneClicked) }),
-                        value = state.title,
-                        onValueChange = {
-                            onEvent(OnTextChanged(it))
-                        }
+                    modifier = Modifier
+                        .weight(1F)
+                        .onKeyEvent {
+                            if (it.key.keyCode == Key.Back.keyCode) {
+                                onEvent(OnBackPressed)
+                            }
+                            false
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { onEvent(OnDoneClicked) }),
+                    value = state.title,
+                    onValueChange = {
+                        onEvent(OnTextChanged(it))
+                    }
                 )
             }
         }
@@ -141,21 +143,21 @@ fun Content(
             }
         }
         Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
         ) {
             Button(
-                    modifier = Modifier.padding(end = 8.dp, top = 8.dp),
-                    onClick = {
-                        onEvent(OnBackPressed)
-                    }) {
+                modifier = Modifier.padding(end = 8.dp, top = 8.dp),
+                onClick = {
+                    onEvent(OnBackPressed)
+                }) {
                 Text(text = stringResource(id = R.string.cancel))
             }
             Button(
-                    modifier = Modifier.padding(top = 8.dp),
-                    onClick = {
-                        onEvent(OnDoneClicked)
-                    }) {
+                modifier = Modifier.padding(top = 8.dp),
+                onClick = {
+                    onEvent(OnDoneClicked)
+                }) {
                 Text(text = stringResource(id = R.string.save))
             }
         }
