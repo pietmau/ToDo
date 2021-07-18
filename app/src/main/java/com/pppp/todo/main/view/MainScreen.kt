@@ -30,6 +30,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
@@ -40,22 +41,26 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.MainViewState
+import com.pppp.todo.main.viewmodel.OneOffEvent
 import kotlinx.coroutines.launch
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun MainScreen(listId: String = "") {
-    val viewModel: MainViewModel = viewModel()
+fun MainScreen(
+    listId: String = "",
+) {
+    val viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
+        viewModel<MainViewModel>()
     LaunchedEffect(listId) {
         viewModel(MainViewEvent.GetList(listId))
     }
     val state by viewModel.states.collectAsState()
     val addToDoBottomSheetState = rememberModalBottomSheetState(
-            ModalBottomSheetValue.Hidden
+        ModalBottomSheetValue.Hidden
     )
     val editToDoBottomSheetState = rememberModalBottomSheetState(
-            ModalBottomSheetValue.Hidden
+        ModalBottomSheetValue.Hidden
     )
     LaunchedEffect(state.addToDo) {
         launch {
@@ -66,16 +71,16 @@ fun MainScreen(listId: String = "") {
         }
     }
     MainScreenImpl(
-            state = state,
-            onEditToDoClicked = { listId, itemId ->
-                viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
-            },
-            onAddToDoClicked = {
-                viewModel(OnAddToDoClicked)
-            },
-            onToDoChecked = { id, checked ->
-                // viewModel(OnToDoCompleted(id, checked))
-            }
+        state = state,
+        onEditToDoClicked = { listId, itemId ->
+            viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
+        },
+        onAddToDoClicked = {
+            viewModel(OnAddToDoClicked)
+        },
+        onToDoChecked = { id, checked ->
+            // viewModel(OnToDoCompleted(id, checked))
+        }
     )
     AddBottomSheet(state.addToDo == Showing) {
         viewModel(it)
@@ -89,34 +94,34 @@ fun MainScreen(listId: String = "") {
 @ExperimentalMaterialApi
 @Composable
 private fun MainScreenImpl(
-        state: MainViewState,
-        onAddToDoClicked: () -> Unit,
-        onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
-        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+    state: MainViewState,
+    onAddToDoClicked: () -> Unit,
+    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
-            scaffoldState = scaffoldState,
-            floatingActionButton = {
-                Fab(onAddToDoClicked)
-            },
-            isFloatingActionButtonDocked = true,
-            bottomBar = {
-                BottomAppBar {}
-            },
-            drawerContent = { Drawer() },
-            topBar = {
-                TopAppBar {
-                    IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    onDrawerClicked(scaffoldState)
-                                }
-                            },
-                            content = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) })
-                }
+        scaffoldState = scaffoldState,
+        floatingActionButton = {
+            Fab(onAddToDoClicked)
+        },
+        isFloatingActionButtonDocked = true,
+        bottomBar = {
+            BottomAppBar {}
+        },
+        drawerContent = { Drawer() },
+        topBar = {
+            TopAppBar {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            onDrawerClicked(scaffoldState)
+                        }
+                    },
+                    content = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) })
             }
+        }
     ) {
         Content(state, onToDoChecked, onEditToDoClicked)
     }
@@ -133,17 +138,17 @@ suspend fun onDrawerClicked(scaffoldState: ScaffoldState) {
 @Composable
 fun Fab(onClick: () -> Unit) {
     FloatingActionButton(
-            modifier = Modifier.size(48.dp),
-            onClick = onClick,
-            content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
+        modifier = Modifier.size(48.dp),
+        onClick = onClick,
+        content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
     )
 }
 
 @Composable
 private fun Content(
-        state: MainViewState,
-        onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
-        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+    state: MainViewState,
+    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     when (state.isLoading) {
         true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
@@ -154,14 +159,14 @@ private fun Content(
 @Composable
 fun Loading() {
     Column(
-            Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(
-                Modifier.size(96.dp)
+            Modifier.size(96.dp)
         )
     }
 }

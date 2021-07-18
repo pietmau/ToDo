@@ -38,6 +38,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun Drawer(
     currentRoute: String = "",
     closeDrawer: () -> Unit = {},
+    onRouteChanged: (String) -> Unit = {},
+    state: State<ViewState> = viewModel<DrawerViewModel>().states.collectAsState()
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (spacer, divider, lists, addList) = createRefs()
@@ -69,7 +71,9 @@ fun Drawer(
                 .constrainAs(addList) {
                     bottom.linkTo(parent.bottom)
                 },
-            onClick = {}
+            onClick = {
+                onRouteChanged
+            }
         )
     }
 }
