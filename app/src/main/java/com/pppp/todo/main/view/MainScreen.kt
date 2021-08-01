@@ -32,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
@@ -45,130 +44,141 @@ import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.main.viewmodel.OneOffEvent
 import kotlinx.coroutines.launch
 
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Composable
-fun MainScreen(
-    listId: String = "",
-    viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
-        viewModel<MainViewModel>(),
-    drawerContent: @Composable ColumnScope.() -> Unit = {}
-) {
 
-    LaunchedEffect(listId) {
-        viewModel(MainViewEvent.GetList(listId))
-    }
-    val state by viewModel.states.collectAsState()
-    val addToDoBottomSheetState = rememberModalBottomSheetState(
-        ModalBottomSheetValue.Hidden
-    )
-    LaunchedEffect(state.addToDo) {
-        launch {
-            when (state.addToDo) {
-                Hidden -> addToDoBottomSheetState.hide()
-                Showing -> addToDoBottomSheetState.show()
-            }.exaustive
-        }
-    }
-    MainScreenImpl(
-        state = state,
-        onEditToDoClicked = { listId, itemId ->
-            viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
-        },
-        onAddToDoClicked = {
-            viewModel(OnAddToDoClicked)
-        },
-        onToDoChecked = { listId, id, checked ->
-            viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
-        },
-        drawerContent = drawerContent
-    )
-    AddBottomSheet(state.addToDo == Showing) {
-        viewModel(it)
-    }
-    EditBottomSheet(state.itemBeingEdited) {
-        viewModel(it)
-    }
-}
+interface MainScreen {
 
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Composable
-private fun MainScreenImpl(
-    state: MainViewState,
-    onAddToDoClicked: () -> Unit,
-    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
-    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
-    drawerContent: @Composable ColumnScope.() -> Unit = {}
-) {
-    val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
-    Scaffold(
-        scaffoldState = scaffoldState,
-        floatingActionButton = {
-            Fab(onAddToDoClicked)
-        },
-        isFloatingActionButtonDocked = true,
-        bottomBar = {
-            BottomAppBar {}
-        },
-        drawerContent = drawerContent,
-        topBar = {
-            TopAppBar {
-                IconButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            onDrawerClicked(scaffoldState)
-                        }
-                    },
-                    content = { Icon(imageVector = Icons.Filled.Menu, contentDescription = null) })
+    companion object {
+        @ExperimentalComposeUiApi
+        @ExperimentalMaterialApi
+        @Composable
+        fun Content(
+            listId: String = "",
+            viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
+                viewModel<MainViewModel>(),
+            drawerContent: @Composable ColumnScope.() -> Unit = {}
+        ) {
+
+            LaunchedEffect(listId) {
+                viewModel(MainViewEvent.GetList(listId))
+            }
+            val state by viewModel.states.collectAsState()
+            val addToDoBottomSheetState = rememberModalBottomSheetState(
+                ModalBottomSheetValue.Hidden
+            )
+            LaunchedEffect(state.addToDo) {
+                launch {
+                    when (state.addToDo) {
+                        Hidden -> addToDoBottomSheetState.hide()
+                        Showing -> addToDoBottomSheetState.show()
+                    }.exaustive
+                }
+            }
+            MainScreenImpl(
+                state = state,
+                onEditToDoClicked = { listId, itemId ->
+                    viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
+                },
+                onAddToDoClicked = {
+                    viewModel(OnAddToDoClicked)
+                },
+                onToDoChecked = { listId, id, checked ->
+                    viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
+                },
+                drawerContent = drawerContent
+            )
+            AddItem.Content(state.addToDo == Showing) {
+                viewModel(it)
+            }
+            EditBottomSheet(state.itemBeingEdited) {
+                viewModel(it)
             }
         }
-    ) {
-        Content(state, onToDoChecked, onEditToDoClicked)
-    }
-}
 
-suspend fun onDrawerClicked(scaffoldState: ScaffoldState) {
-    if (scaffoldState.drawerState.isOpen) {
-        scaffoldState.drawerState.close()
-    } else {
-        scaffoldState.drawerState.open()
-    }
-}
+        @ExperimentalComposeUiApi
+        @ExperimentalMaterialApi
+        @Composable
+        private fun MainScreenImpl(
+            state: MainViewState,
+            onAddToDoClicked: () -> Unit,
+            onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
+            onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
+            drawerContent: @Composable ColumnScope.() -> Unit = {}
+        ) {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            Scaffold(
+                scaffoldState = scaffoldState,
+                floatingActionButton = {
+                    Fab(onAddToDoClicked)
+                },
+                isFloatingActionButtonDocked = true,
+                bottomBar = {
+                    BottomAppBar {}
+                },
+                drawerContent = drawerContent,
+                topBar = {
+                    TopAppBar {
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    onDrawerClicked(scaffoldState)
+                                }
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = null
+                                )
+                            })
+                    }
+                }
+            ) {
+                Content(state, onToDoChecked, onEditToDoClicked)
+            }
+        }
 
-@Composable
-fun Fab(onClick: () -> Unit) {
-    FloatingActionButton(
-        modifier = Modifier.size(48.dp),
-        onClick = onClick,
-        content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
-    )
-}
+        suspend fun onDrawerClicked(scaffoldState: ScaffoldState) {
+            if (scaffoldState.drawerState.isOpen) {
+                scaffoldState.drawerState.close()
+            } else {
+                scaffoldState.drawerState.open()
+            }
+        }
 
-@Composable
-private fun Content(
-    state: MainViewState,
-    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
-    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
-) {
-    when (state.isLoading) {
-        true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
-        else -> Loading()
-    }.exaustive
-}
+        @Composable
+        fun Fab(onClick: () -> Unit) {
+            FloatingActionButton(
+                modifier = Modifier.size(48.dp),
+                onClick = onClick,
+                content = { Icon(imageVector = Icons.Outlined.Add, contentDescription = null) }
+            )
+        }
 
-@Composable
-fun Loading() {
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularProgressIndicator(
-            Modifier.size(96.dp)
-        )
+        @Composable
+        private fun Content(
+            state: MainViewState,
+            onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
+            onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+        ) {
+            when (state.isLoading) {
+                true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
+                else -> Loading()
+            }.exaustive
+        }
+
+        @Composable
+        fun Loading() {
+            Column(
+                Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    Modifier.size(96.dp)
+                )
+            }
+        }
     }
 }

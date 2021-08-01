@@ -3,7 +3,9 @@ package com.pppp.uielements
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -40,18 +42,23 @@ interface Calendar {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Image(
+                    Row(
                         modifier = Modifier
+                            .wrapContentWidth()
                             .clickable {
                                 dialog.show()
                             },
-                        imageVector = Icons.Outlined.DateRange,
-                        contentDescription = "",
-                    )
-                    Text(
-                        text = due.toDueDateText() ?: "Due",
-                        style = MaterialTheme.typography.caption
-                    )
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Image(
+                            imageVector = Icons.Outlined.DateRange,
+                            contentDescription = "",
+                        )
+                        Text(
+                            text = due.toDueDateText() ?: "Due",
+                            style = MaterialTheme.typography.caption
+                        )
+                    }
                     due?.let {
                         Image(
                             modifier = Modifier

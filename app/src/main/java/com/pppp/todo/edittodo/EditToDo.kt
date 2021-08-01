@@ -122,9 +122,10 @@ fun Content(
             }
         }
         Row {
-            Calendar.Content(state.due) {
+            val onTimeDataPicked: (Long?) -> Unit = {
                 onEvent(EditTodoViewEvent.OnDateTimePicked(it))
             }
+            Calendar.Content(state.due, onTimeDataPicked)
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

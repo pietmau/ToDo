@@ -8,7 +8,6 @@ import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.main.viewmodel.ToDoViewModel
 import org.junit.Rule
 import org.junit.Test
-import androidx.compose.ui.test.junit4
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -20,7 +19,7 @@ class MainScreenKtTest {
     @Test
     fun when_bar_then_fobar() {
         composeTestRule.setContent {
-            MainScreen()
+            Content()
         }
         viewModel._uiStates.tryEmit(MainViewState(todos = listOf(ToDoViewModel("", "", "Title"))))
     }
