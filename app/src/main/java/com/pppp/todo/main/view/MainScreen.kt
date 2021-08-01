@@ -41,6 +41,7 @@ import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewModel
 import com.pppp.todo.main.viewmodel.MainViewState
 import com.pppp.todo.main.viewmodel.OneOffEvent
+import com.pppp.uielements.Loading
 import kotlinx.coroutines.launch
 
 
@@ -135,23 +136,8 @@ interface MainScreen {
         ) {
             when (state.isLoading) {
                 true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
-                else -> Loading()
+                else -> Loading.Content()
             }.exaustive
-        }
-
-        @Composable
-        fun Loading() {
-            Column(
-                Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator(
-                    Modifier.size(96.dp)
-                )
-            }
         }
     }
 }

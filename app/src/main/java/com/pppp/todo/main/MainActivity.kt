@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.pppp.todo.main.MainActivityViewModel.ViewState
 import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
 import com.pppp.todo.main.MainActivityViewModel.ViewState.None
+import com.pppp.uielements.Loading
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -62,10 +63,7 @@ class MainActivity : ComponentActivity() {
                     listId = state.listId,
                     onNavigationIconClicked = scaffoldState::toggle
                 )
-                is None -> MainScreen.Content(
-                    listId = "m7nagiQ0KWgCg2Cj61Ho",
-                    onNavigationIconClicked = scaffoldState::toggle
-                )
+                is None -> Loading.Content()
             }.exaustive
 
         }
