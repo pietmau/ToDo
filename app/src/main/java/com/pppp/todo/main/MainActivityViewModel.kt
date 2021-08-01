@@ -21,6 +21,7 @@ class MainActivityViewModel @Inject constructor() :
     }
 
     sealed class ViewState {
+        object Loading : ViewState()
         object None : ViewState()
         data class Content(val listId: String) : ViewState()
     }

@@ -1,31 +1,19 @@
 package com.pppp.todo.main.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -54,8 +42,7 @@ interface MainScreen {
         fun Content(
             listId: String = "",
             viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
-                viewModel<MainViewModel>(),
-            onNavigationIconClicked: suspend () -> Unit = {}
+                viewModel<MainViewModel>()
         ) {
             LaunchedEffect(listId) {
                 viewModel(MainViewEvent.GetList(listId))
@@ -81,23 +68,6 @@ interface MainScreen {
                 isFloatingActionButtonDocked = true,
                 bottomBar = {
                     BottomAppBar {}
-                },
-                topBar = {
-                    TopAppBar {
-                        val scope = rememberCoroutineScope()
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    onNavigationIconClicked()
-                                }
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = null
-                                )
-                            })
-                    }
                 },
                 content = {
                     Content(

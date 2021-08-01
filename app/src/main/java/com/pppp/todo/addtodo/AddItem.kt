@@ -70,12 +70,11 @@ interface AddItem {
                 onDismissed = {
                     viewmodel(OnBackPressed)
                 },
-            )
-            {
-                AddToDo(viewmodel.states.collectAsState()) {
-                    viewmodel(it)
-                }
-            }
+                content = {
+                    AddToDo(viewmodel.states.collectAsState()) {
+                        viewmodel(it)
+                    }
+                })
         }
 
         @ExperimentalComposeUiApi
