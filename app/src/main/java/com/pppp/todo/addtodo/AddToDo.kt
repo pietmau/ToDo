@@ -50,20 +50,6 @@ fun AddBottomSheet(
     isVisible: Boolean = false,
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
-    val modalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(isVisible) {
-        launch {
-            when (isVisible) {
-                true -> modalBottomSheetState.show()
-                false -> {
-                    modalBottomSheetState.hide()
-                    keyboardController?.hide()
-                }
-            }.exaustive
-        }
-    }
 
     val viewmodel: AddTodoViewModel = viewModel()
 
@@ -81,7 +67,7 @@ fun AddBottomSheet(
         }
     }
     BottomSheet.Content(
-        modalBottomSheetState = modalBottomSheetState,
+        isOpen = isVisible,
         onBackPressed = {
             viewmodel(Event.OnBackPressed)
         },

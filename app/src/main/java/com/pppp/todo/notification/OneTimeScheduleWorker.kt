@@ -19,7 +19,7 @@ import com.pppp.todo.main.MainActivity.Companion.PENDING_INTENT_REQUEST_CODE
 import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.DUE
 import com.pppp.todo.notification.WorkManagerNotificationScheduler.Companion.TITLE
 import com.pppp.todo.toDueDateNotificationText
-import com.pppp.todo.toMillis
+import com.pppp.uielements.toMillis
 import java.time.LocalDateTime.now
 
 

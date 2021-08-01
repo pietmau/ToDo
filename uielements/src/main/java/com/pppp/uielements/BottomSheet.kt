@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -24,12 +25,22 @@ interface BottomSheet {
         @ExperimentalMaterialApi
         @Composable
         fun Content(
-            modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-                initialValue = Hidden
-            ),
+            isOpen: Boolean = false,
             onBackPressed: () -> Unit = {},
             content: @Composable() (ColumnScope.() -> Unit) = {}
         ) {
+            val modalBottomSheetState: ModalBottomSheetState =
+                rememberModalBottomSheetState(initialValue = Hidden)
+            val keyboardController = LocalSoftwareKeyboardController.current
+
+            LaunchedEffect(isOpen) {
+                if (isOpen) {
+                    modalBottomSheetState.show()
+                } else {
+                    modalBottomSheetState.hide()
+                    keyboardController?.hide()
+                }
+            }
             ModalBottomSheetLayout(
                 sheetState = modalBottomSheetState,
                 sheetContent = content,

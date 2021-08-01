@@ -59,9 +59,6 @@ fun MainScreen(
     val addToDoBottomSheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden
     )
-    val editToDoBottomSheetState = rememberModalBottomSheetState(
-        ModalBottomSheetValue.Hidden
-    )
     LaunchedEffect(state.addToDo) {
         launch {
             when (state.addToDo) {
@@ -85,7 +82,7 @@ fun MainScreen(
     AddBottomSheet(state.addToDo == Showing) {
         viewModel(it)
     }
-    EditBottomSheet(state.itemBeingEdited, editToDoBottomSheetState) {
+    EditBottomSheet(state.itemBeingEdited) {
         viewModel(it)
     }
 }

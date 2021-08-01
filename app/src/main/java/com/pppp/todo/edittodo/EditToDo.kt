@@ -38,12 +38,11 @@ import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.exaustive
-import exaustive
-import com.pppp.todo.main.view.Calendar
 import com.pppp.todo.main.viewmodel.ItemBeingEdited
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
+import com.pppp.uielements.Calendar
 import kotlinx.coroutines.flow.collect
 
 @ExperimentalComposeUiApi
@@ -51,9 +50,6 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun EditBottomSheet(
     item: ItemBeingEdited = ItemBeingEdited.None,
-    modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        ModalBottomSheetValue.Hidden
-    ),
     onEvent: (MainViewEvent) -> Unit = {}
 ) {
     val editViewModel = viewModel<EditViewModel>()
@@ -77,15 +73,8 @@ fun EditBottomSheet(
     val state by editViewModel.states.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(state.isVisible) {
-        if (state.isVisible) {
-            modalBottomSheetState.show()
-        } else {
-            modalBottomSheetState.hide()
-            keyboardController?.hide()
-        }
-    }
     BottomSheet.Content(
+        isOpen = state.isVisible,
         onBackPressed = {
             editViewModel(OnBackPressed)
         },
@@ -95,8 +84,7 @@ fun EditBottomSheet(
             ) {
                 editViewModel(it)
             }
-        },
-        modalBottomSheetState = modalBottomSheetState
+        }
     )
 }
 
@@ -139,7 +127,7 @@ fun Content(
             }
         }
         Row {
-            Calendar(state.due) {
+            Calendar.Content(state.due) {
                 onEvent(EditTodoViewEvent.OnDateTimePicked(it))
             }
         }
