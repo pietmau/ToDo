@@ -33,8 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
-import com.pppp.todo.exaustive
-import com.pppp.todo.main.viewmodel.AddToDo.Hidden
+import exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
@@ -64,10 +63,7 @@ fun MainScreen(
     )
     LaunchedEffect(state.addToDo) {
         launch {
-            when (state.addToDo) {
-                Hidden -> addToDoBottomSheetState.hide()
-                Showing -> addToDoBottomSheetState.show()
-            }.exaustive
+            exaustive
         }
     }
     MainScreenImpl(
@@ -78,8 +74,8 @@ fun MainScreen(
         onAddToDoClicked = {
             viewModel(OnAddToDoClicked)
         },
-        onToDoChecked = { id, checked ->
-            // viewModel(OnToDoCompleted(id, checked))
+        onToDoChecked = { listId, id, checked ->
+            viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
         }
     )
     AddBottomSheet(state.addToDo == Showing) {
@@ -96,7 +92,7 @@ fun MainScreen(
 private fun MainScreenImpl(
     state: MainViewState,
     onAddToDoClicked: () -> Unit,
-    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
     onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -147,13 +143,10 @@ fun Fab(onClick: () -> Unit) {
 @Composable
 private fun Content(
     state: MainViewState,
-    onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
     onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
-    when (state.isLoading) {
-        true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
-        else -> Loading()
-    }.exaustive
+    exaustive
 }
 
 @Composable

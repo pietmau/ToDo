@@ -37,7 +37,7 @@ import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
-import com.pppp.todo.exaustive
+import exaustive
 import com.pppp.todo.main.view.Calendar
 import com.pppp.todo.main.viewmodel.ItemBeingEdited
 import com.pppp.todo.main.viewmodel.MainViewEvent
@@ -58,9 +58,7 @@ fun EditBottomSheet(
     val editViewModel = viewModel<EditViewModel>()
     LaunchedEffect(editViewModel, onEvent) {
         editViewModel.oneOffEvents.collect {
-            when (it) {
-                is OneOffEvents.OnCancel -> onEvent(OnCancel)
-            }.exaustive
+            exaustive
         }
     }
     LaunchedEffect(item) {

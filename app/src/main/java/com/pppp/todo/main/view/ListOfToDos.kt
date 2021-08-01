@@ -12,7 +12,7 @@ import com.pppp.todo.main.viewmodel.MainViewState
 @Composable
 fun ListOfToDos(
         mainViewState: MainViewState,
-        onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
+        onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
         onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     LazyColumn(

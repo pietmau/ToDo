@@ -16,40 +16,40 @@ import com.pppp.todo.toDueDateText
 
 @Composable
 fun ToDoItem(
-        toDo: ToDoViewModel = ToDoViewModel(listId = "", id = "", title = "Title"),
-        onToDoChecked: (String, Boolean) -> Unit = { _, _ -> },
-        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+    toDo: ToDoViewModel = ToDoViewModel(listId = "", id = "", title = "Title"),
+    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
+    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
     Card(
-            modifier = Modifier
-                    .padding(
-                            PaddingValues(
-                                    start = 4.dp,
-                                    end = 4.dp,
-                                    top = 4.dp,
-                                    bottom = 0.dp
-                            )
-                    )
-                    .clickable {
-                        onEditToDoClicked(toDo.listId, toDo.id)
-                    },
-            elevation = 4.dp,
-            shape = MaterialTheme.shapes.medium.copy(
-                    topStart = CornerSize(4.dp)
+        modifier = Modifier
+            .padding(
+                PaddingValues(
+                    start = 4.dp,
+                    end = 4.dp,
+                    top = 4.dp,
+                    bottom = 0.dp
+                )
             )
+            .clickable {
+                onEditToDoClicked(toDo.listId, toDo.id)
+            },
+        elevation = 4.dp,
+        shape = MaterialTheme.shapes.medium.copy(
+            topStart = CornerSize(4.dp)
+        )
     ) {
         Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                        .padding(8.dp)
-                        .height(48.dp)
-                        .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(8.dp)
+                .height(48.dp)
+                .fillMaxWidth(),
         ) {
             ToDoCheckBox(toDo, onToDoChecked)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                    text = toDo.title,
-                    modifier = Modifier.weight(1F, true)
+                text = toDo.title,
+                modifier = Modifier.weight(1F, true)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Due(toDo)
@@ -63,27 +63,27 @@ fun Due(toDo: ToDoViewModel) {
     toDo.due ?: return
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-                modifier = Modifier.size(16.dp),
-                imageVector = Icons.Outlined.DateRange,
-                contentDescription = ""
+            modifier = Modifier.size(16.dp),
+            imageVector = Icons.Outlined.DateRange,
+            contentDescription = ""
         )
         Spacer(modifier = Modifier.width(2.dp))
         Text(
-                text = "Due ${toDo.due.toDueDateText()}", //TODO
-                style = MaterialTheme.typography.caption
+            text = "Due ${toDo.due.toDueDateText()}", //TODO
+            style = MaterialTheme.typography.caption
         )
     }
 }
 
 @Composable
 private fun ToDoCheckBox(
-        toDo: ToDoViewModel,
-        onToDoChecked: (String, Boolean) -> Unit = { _, _ -> }
+    toDo: ToDoViewModel,
+    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> }
 ) {
     var isChecked by remember { mutableStateOf(false) }
     Checkbox(checked = isChecked, onCheckedChange = {
         isChecked = it
-        onToDoChecked(toDo.id, it)
+        onToDoChecked(toDo.listId, toDo.id, it)
     })
 }
 

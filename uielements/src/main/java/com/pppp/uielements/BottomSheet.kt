@@ -7,6 +7,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.ModalBottomSheetValue.Hidden
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -14,29 +16,37 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Composable
-fun BottomSheet(
-    modalBottomSheetState: ModalBottomSheetState,
-    onBackPressed: () -> Unit = {},
-    content: @Composable() (ColumnScope.() -> Unit) = {}
-) {
-    ModalBottomSheetLayout(
-        sheetState = modalBottomSheetState,
-        sheetContent = content,
-        sheetShape = RoundedCornerShape(4.dp),
-        content = {}
-    )
-    LaunchedEffect(modalBottomSheetState.currentValue) {
-        if (modalBottomSheetState.currentValue == ModalBottomSheetValue.Hidden) {
-            onBackPressed()
-        }
-    }
-    val coroutineScope = rememberCoroutineScope()
-    BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
-        coroutineScope.launch {
-            onBackPressed()
+interface BottomSheet {
+
+    companion object {
+
+        @ExperimentalComposeUiApi
+        @ExperimentalMaterialApi
+        @Composable
+        fun Content(
+            modalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
+                initialValue = Hidden
+            ),
+            onBackPressed: () -> Unit = {},
+            content: @Composable() (ColumnScope.() -> Unit) = {}
+        ) {
+            ModalBottomSheetLayout(
+                sheetState = modalBottomSheetState,
+                sheetContent = content,
+                sheetShape = RoundedCornerShape(4.dp),
+                content = {}
+            )
+            LaunchedEffect(modalBottomSheetState.currentValue) {
+                if (modalBottomSheetState.currentValue == Hidden) {
+                    onBackPressed()
+                }
+            }
+            val coroutineScope = rememberCoroutineScope()
+            BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                coroutineScope.launch {
+                    onBackPressed()
+                }
+            }
         }
     }
 }
