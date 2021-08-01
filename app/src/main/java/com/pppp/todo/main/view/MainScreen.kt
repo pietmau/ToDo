@@ -54,9 +54,8 @@ interface MainScreen {
             listId: String = "",
             viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
                 viewModel<MainViewModel>(),
-            drawerContent: @Composable ColumnScope.() -> Unit = {}
+            onNavigationIconClicked: suspend () -> Unit = {}
         ) {
-
             LaunchedEffect(listId) {
                 viewModel(MainViewEvent.GetList(listId))
             }
@@ -72,11 +71,33 @@ interface MainScreen {
                     }.exaustive
                 }
             }
-            MainScreenImpl(
-                onAddToDoClicked = {
-                    viewModel(OnAddToDoClicked)
+            Scaffold(
+                floatingActionButton = {
+                    Fab(onClick = {
+                        viewModel(OnAddToDoClicked)
+                    })
                 },
-                drawerContent = drawerContent,
+                isFloatingActionButtonDocked = true,
+                bottomBar = {
+                    BottomAppBar {}
+                },
+                topBar = {
+                    TopAppBar {
+                        val scope = rememberCoroutineScope()
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    onNavigationIconClicked()
+                                }
+                            },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = null
+                                )
+                            })
+                    }
+                },
                 content = {
                     Content(
                         state = state,
@@ -95,50 +116,6 @@ interface MainScreen {
             EditItem.Content(state.itemBeingEdited) {
                 viewModel(it)
             }
-        }
-
-        @ExperimentalComposeUiApi
-        @ExperimentalMaterialApi
-        @Composable
-        private fun MainScreenImpl(
-            onAddToDoClicked: () -> Unit,
-            drawerContent: @Composable() (ColumnScope.() -> Unit) = {},
-            content: @Composable () -> Unit = {},
-        ) {
-            val scaffoldState = rememberScaffoldState()
-            val coroutineScope = rememberCoroutineScope()
-            Scaffold(
-                scaffoldState = scaffoldState,
-                floatingActionButton = {
-                    Fab(onAddToDoClicked)
-                },
-                isFloatingActionButtonDocked = true,
-                bottomBar = {
-                    BottomAppBar {}
-                },
-                drawerContent = drawerContent,
-                topBar = {
-                    TopAppBar {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    if (scaffoldState.drawerState.isOpen) {
-                                        scaffoldState.drawerState.close()
-                                    } else {
-                                        scaffoldState.drawerState.open()
-                                    }
-                                }
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = null
-                                )
-                            })
-                    }
-                },
-                content = { content() }
-            )
         }
 
         @Composable
