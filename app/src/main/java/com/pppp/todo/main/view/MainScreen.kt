@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.edittodo.EditBottomSheet
+import com.pppp.todo.edittodo.EditItem
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
 import com.pppp.todo.main.viewmodel.AddToDo.Hidden
@@ -83,13 +83,12 @@ interface MainScreen {
                 },
                 onToDoChecked = { listId, id, checked ->
                     viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
-                },
-                drawerContent = drawerContent
+                }//, drawerContent = drawerContent
             )
             AddItem.Content(state.addToDo == Showing) {
                 viewModel(it)
             }
-            EditBottomSheet(state.itemBeingEdited) {
+            EditItem.Content(state.itemBeingEdited) {
                 viewModel(it)
             }
         }
@@ -102,7 +101,8 @@ interface MainScreen {
             onAddToDoClicked: () -> Unit,
             onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
             onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
-            drawerContent: @Composable ColumnScope.() -> Unit = {}
+            drawerContent: @Composable ColumnScope.() -> Unit = {},
+            content: @Composable ColumnScope.() -> Unit = {},
         ) {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
