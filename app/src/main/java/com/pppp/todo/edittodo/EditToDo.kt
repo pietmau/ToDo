@@ -9,11 +9,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,9 +47,9 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun EditBottomSheet(
     item: ItemBeingEdited = ItemBeingEdited.None,
-    onEvent: (MainViewEvent) -> Unit = {}
+    onEvent: (MainViewEvent) -> Unit = {},
+    editViewModel: EditViewModel = viewModel<EditViewModel>()
 ) {
-    val editViewModel = viewModel<EditViewModel>()
     LaunchedEffect(editViewModel, onEvent) {
         editViewModel.oneOffEvents.collect {
             when (it) {
@@ -71,10 +68,9 @@ fun EditBottomSheet(
         }
     }
     val state by editViewModel.states.collectAsState()
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     BottomSheet.Content(
-        isOpen = state.isVisible,
+        isExpanded = state.isVisible,
         onBackPressed = {
             editViewModel(OnBackPressed)
         },

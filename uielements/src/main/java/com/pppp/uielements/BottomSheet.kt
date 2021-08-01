@@ -25,7 +25,7 @@ interface BottomSheet {
         @ExperimentalMaterialApi
         @Composable
         fun Content(
-            isOpen: Boolean = false,
+            isExpanded: Boolean = false,
             onBackPressed: () -> Unit = {},
             content: @Composable() (ColumnScope.() -> Unit) = {}
         ) {
@@ -33,8 +33,8 @@ interface BottomSheet {
                 rememberModalBottomSheetState(initialValue = Hidden)
             val keyboardController = LocalSoftwareKeyboardController.current
 
-            LaunchedEffect(isOpen) {
-                if (isOpen) {
+            LaunchedEffect(isExpanded) {
+                if (isExpanded) {
                     modalBottomSheetState.show()
                 } else {
                     modalBottomSheetState.hide()

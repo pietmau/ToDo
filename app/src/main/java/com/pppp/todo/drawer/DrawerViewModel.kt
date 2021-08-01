@@ -49,5 +49,8 @@ data class ViewState(val lists: List<ToDoList> = emptyList()) {
     )
 }
 
-sealed class Event
+sealed class Event {
+    object AddListClicked : Event()
+}
+
 sealed class OneOffEvent

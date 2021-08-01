@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.drawer.Drawer
+import com.pppp.todo.drawer.Content
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
@@ -107,7 +107,7 @@ private fun MainScreenImpl(
         bottomBar = {
             BottomAppBar {}
         },
-        drawerContent = { Drawer() },
+        drawerContent = { Content() },
         topBar = {
             TopAppBar {
                 IconButton(

@@ -9,10 +9,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -25,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,7 +37,6 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.uielements.BottomSheet
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import com.pppp.uielements.Calendar
 
 @ExperimentalComposeUiApi
@@ -67,7 +63,7 @@ fun AddBottomSheet(
         }
     }
     BottomSheet.Content(
-        isOpen = isVisible,
+        isExpanded = isVisible,
         onBackPressed = {
             viewmodel(Event.OnBackPressed)
         },
