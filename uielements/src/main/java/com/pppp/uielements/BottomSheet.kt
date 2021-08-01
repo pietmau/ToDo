@@ -26,7 +26,7 @@ interface BottomSheet {
         @Composable
         fun Content(
             isExpanded: Boolean = false,
-            onBackPressed: () -> Unit = {},
+            onDismissed: () -> Unit = {},
             content: @Composable() (ColumnScope.() -> Unit) = {}
         ) {
             val modalBottomSheetState: ModalBottomSheetState =
@@ -49,13 +49,13 @@ interface BottomSheet {
             )
             LaunchedEffect(modalBottomSheetState.currentValue) {
                 if (modalBottomSheetState.currentValue == Hidden) {
-                    onBackPressed()
+                    onDismissed()
                 }
             }
             val coroutineScope = rememberCoroutineScope()
             BackHandler(modalBottomSheetState.currentValue == ModalBottomSheetValue.Expanded) {
                 coroutineScope.launch {
-                    onBackPressed()
+                    onDismissed()
                 }
             }
         }

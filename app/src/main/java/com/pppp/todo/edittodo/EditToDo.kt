@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,8 +46,8 @@ import kotlinx.coroutines.flow.collect
 @Composable
 fun EditBottomSheet(
     item: ItemBeingEdited = ItemBeingEdited.None,
-    onEvent: (MainViewEvent) -> Unit = {},
-    editViewModel: EditViewModel = viewModel<EditViewModel>()
+    editViewModel: EditViewModel = viewModel<EditViewModel>(),
+    onEvent: (MainViewEvent) -> Unit = {}
 ) {
     LaunchedEffect(editViewModel, onEvent) {
         editViewModel.oneOffEvents.collect {
@@ -71,7 +70,7 @@ fun EditBottomSheet(
 
     BottomSheet.Content(
         isExpanded = state.isVisible,
-        onBackPressed = {
+        onDismissed = {
             editViewModel(OnBackPressed)
         },
         content = {

@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.pppp.todo.drawer.Event.AddListClicked
+import com.pppp.todo.drawer.ViewState.AddList.Hidden
+import com.pppp.todo.drawer.ViewState.AddList.Showing
 
 @HiltViewModel
 class DrawerViewModel @Inject constructor(
@@ -32,13 +33,14 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
-    override fun invoke(event: Event) =
-        when (event) {
-            AddListClicked -> emitOneOffEvent()
-        }
+    override fun invoke(event: Event) {}
+
 }
 
-data class ViewState(val lists: List<ToDoList> = emptyList()) {
+data class ViewState(
+    val lists: List<ToDoList> = emptyList(),
+    val addList: AddList = Hidden
+) {
 
     data class ToDoList(
         val id: String? = null,
@@ -49,12 +51,13 @@ data class ViewState(val lists: List<ToDoList> = emptyList()) {
         val deleted: Boolean = false,
         val priority: Long = 0
     )
+
+    sealed class AddList {
+        object Hidden : AddList()
+        object Showing : AddList()
+    }
 }
 
-sealed class Event {
-    object AddListClicked : Event()
-}
+sealed class Event
 
-sealed class OneOffEvent {
-    object AddList : OneOffEvent()
-}
+sealed class OneOffEvent

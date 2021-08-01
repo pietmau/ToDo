@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -27,23 +28,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.uielements.BottomSheet
+import com.pppp.todo.drawer.ViewState.AddList.Showing
 
 interface Drawer {
 
     companion object {
 
+        @ExperimentalMaterialApi
+        @ExperimentalComposeUiApi
         @Composable
         fun Content(
             currentRoute: String = "",
             closeDrawer: () -> Unit = {},
             onRouteChanged: (String) -> Unit = {},
-            viewModel: DrawerViewModel = viewModel()
+            viewModel: DrawerViewModel = viewModel(),
+            addListClicked: () -> Unit = {}
         ) {
             val state: State<ViewState> = viewModel.states.collectAsState()
 
@@ -72,14 +79,12 @@ interface Drawer {
                     items = state.value.lists,
                     closeDrawer = closeDrawer
                 )
-                AddList(
+                AddListRow(
                     modifier = Modifier
                         .constrainAs(addList) {
                             bottom.linkTo(parent.bottom)
                         },
-                    onClick = {
-                       viewModel.invoke(Event.AddListClicked)
-                    }
+                    onClick = addListClicked
                 )
             }
         }
@@ -104,7 +109,7 @@ interface Drawer {
         }
 
         @Composable
-        private fun AddList(
+        private fun AddListRow(
             modifier: Modifier = Modifier,
             onClick: () -> Unit = {}
         ) {
@@ -185,6 +190,8 @@ interface Drawer {
     }
 }
 
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @Preview
 @Composable
 fun DrawerPreview() {

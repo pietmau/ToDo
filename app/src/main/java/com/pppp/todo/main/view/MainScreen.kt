@@ -2,6 +2,7 @@ package com.pppp.todo.main.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -31,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import com.pppp.todo.drawer.Content
+import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
@@ -49,9 +50,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     listId: String = "",
+    viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
+        viewModel<MainViewModel>(),
+    drawerContent: @Composable ColumnScope.() -> Unit = {}
 ) {
-    val viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
-        viewModel<MainViewModel>()
+
     LaunchedEffect(listId) {
         viewModel(MainViewEvent.GetList(listId))
     }
@@ -77,7 +80,8 @@ fun MainScreen(
         },
         onToDoChecked = { listId, id, checked ->
             viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
-        }
+        },
+        drawerContent = drawerContent
     )
     AddBottomSheet(state.addToDo == Showing) {
         viewModel(it)
@@ -94,7 +98,8 @@ private fun MainScreenImpl(
     state: MainViewState,
     onAddToDoClicked: () -> Unit,
     onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
-    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
+    drawerContent: @Composable ColumnScope.() -> Unit = {}
 ) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -107,7 +112,7 @@ private fun MainScreenImpl(
         bottomBar = {
             BottomAppBar {}
         },
-        drawerContent = { Content() },
+        drawerContent = drawerContent,
         topBar = {
             TopAppBar {
                 IconButton(

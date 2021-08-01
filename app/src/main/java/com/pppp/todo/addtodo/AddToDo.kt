@@ -64,7 +64,7 @@ fun AddBottomSheet(
     }
     BottomSheet.Content(
         isExpanded = isVisible,
-        onBackPressed = {
+        onDismissed = {
             viewmodel(Event.OnBackPressed)
         },
     )
