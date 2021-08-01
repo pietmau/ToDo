@@ -14,7 +14,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -74,16 +73,21 @@ interface MainScreen {
                 }
             }
             MainScreenImpl(
-                state = state,
-                onEditToDoClicked = { listId, itemId ->
-                    viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
-                },
                 onAddToDoClicked = {
                     viewModel(OnAddToDoClicked)
                 },
-                onToDoChecked = { listId, id, checked ->
-                    viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
-                }//, drawerContent = drawerContent
+                drawerContent = drawerContent,
+                content = {
+                    Content(
+                        state = state,
+                        onToDoChecked = { listId, id, checked ->
+                            viewModel(MainViewEvent.OnToDoCompleted(listId, id, checked))
+                        },
+                        onEditToDoClicked = { listId, itemId ->
+                            viewModel(OnEditToDoClicked(listId = listId, itemId = itemId))
+                        }
+                    )
+                }
             )
             AddItem.Content(state.addToDo == Showing) {
                 viewModel(it)
@@ -97,12 +101,9 @@ interface MainScreen {
         @ExperimentalMaterialApi
         @Composable
         private fun MainScreenImpl(
-            state: MainViewState,
             onAddToDoClicked: () -> Unit,
-            onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
-            onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
-            drawerContent: @Composable ColumnScope.() -> Unit = {},
-            content: @Composable ColumnScope.() -> Unit = {},
+            drawerContent: @Composable() (ColumnScope.() -> Unit) = {},
+            content: @Composable () -> Unit = {},
         ) {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
@@ -121,7 +122,11 @@ interface MainScreen {
                         IconButton(
                             onClick = {
                                 coroutineScope.launch {
-                                    onDrawerClicked(scaffoldState)
+                                    if (scaffoldState.drawerState.isOpen) {
+                                        scaffoldState.drawerState.close()
+                                    } else {
+                                        scaffoldState.drawerState.open()
+                                    }
                                 }
                             },
                             content = {
@@ -131,18 +136,9 @@ interface MainScreen {
                                 )
                             })
                     }
-                }
-            ) {
-                Content(state, onToDoChecked, onEditToDoClicked)
-            }
-        }
-
-        suspend fun onDrawerClicked(scaffoldState: ScaffoldState) {
-            if (scaffoldState.drawerState.isOpen) {
-                scaffoldState.drawerState.close()
-            } else {
-                scaffoldState.drawerState.open()
-            }
+                },
+                content = { content() }
+            )
         }
 
         @Composable
