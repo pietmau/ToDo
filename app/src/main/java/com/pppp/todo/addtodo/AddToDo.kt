@@ -34,6 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
 import com.pppp.todo.addtodo.AddTodoViewModel
 import com.pppp.todo.addtodo.Event
+import com.pppp.todo.addtodo.OneOffEvent
 import com.pppp.todo.addtodo.ViewState
 import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.MainViewEvent
@@ -50,10 +51,17 @@ fun AddBottomSheet(
     onEvent: (MainViewEvent) -> Unit = {},
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(isVisible) {
         launch {
-            exaustive
+            when (isVisible) {
+                true -> modalBottomSheetState.show()
+                false -> {
+                    modalBottomSheetState.hide()
+                    keyboardController?.hide()
+                }
+            }.exaustive
         }
     }
 
@@ -61,7 +69,15 @@ fun AddBottomSheet(
 
     LaunchedEffect(onEvent) {
         viewmodel.oneOffEvents.collect {
-            exaustive
+            when (it) {
+                is OneOffEvent.AddToDo -> onEvent(
+                    MainViewEvent.OnToDoAdded(
+                        title = it.title,
+                        due = it.due
+                    )
+                )
+                is OneOffEvent.OnBackPressed -> onEvent(MainViewEvent.OnCancel)
+            }.exaustive
         }
     }
     BottomSheet.Content(

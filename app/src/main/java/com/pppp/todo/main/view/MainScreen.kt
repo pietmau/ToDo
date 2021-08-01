@@ -33,8 +33,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditBottomSheet
-import exaustive
+import com.pppp.todo.exaustive
 import com.pppp.todo.main.viewmodel.AddToDo.Showing
+import com.pppp.todo.main.viewmodel.AddToDo.Hidden
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnAddToDoClicked
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnEditToDoClicked
@@ -63,7 +64,10 @@ fun MainScreen(
     )
     LaunchedEffect(state.addToDo) {
         launch {
-            exaustive
+            when (state.addToDo) {
+                Hidden -> addToDoBottomSheetState.hide()
+                Showing -> addToDoBottomSheetState.show()
+            }.exaustive
         }
     }
     MainScreenImpl(
@@ -146,7 +150,10 @@ private fun Content(
     onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
     onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
 ) {
-    exaustive
+    when (state.isLoading) {
+        true -> ListOfToDos(state, onToDoChecked, onEditToDoClicked)
+        else -> Loading()
+    }.exaustive
 }
 
 @Composable
