@@ -188,6 +188,9 @@ interface Drawer {
 @Preview
 @Composable
 fun DrawerPreview() {
+    val state =
+        remember { mutableStateOf(ViewState(lists = listOf(ViewState.ToDoList(name = "Foo")))) }
     Drawer.Content()
 }
-
+    
+    
