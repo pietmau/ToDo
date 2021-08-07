@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.pppp.database.FirebaseLastVisitedListRepository
 import com.pppp.database.FirebaseListsRepository
 import com.pppp.database.FirebaseToDosRepository
 import com.pppp.entities.ToDo
@@ -20,6 +21,8 @@ import com.pppp.usecases.ListsRepository
 import com.pppp.usecases.todos.EditTodoUseCase
 import com.pppp.usecases.ToDosRepository
 import com.pppp.usecases.lists.GetListsUseCase
+import com.pppp.usecases.main.LastVisitedListRepository
+import com.pppp.usecases.main.LastVisitedUseCase
 import com.pppp.usecases.notification.NotificationScheduler
 import com.pppp.usecases.todos.GetToDoUseCase
 import dagger.Binds
@@ -46,25 +49,25 @@ abstract class MainModule {
 
         @Provides
         fun provideFirebaseListsRepository(): ListsRepository =
-                FirebaseListsRepository(Firebase.firestore)
+            FirebaseListsRepository(Firebase.firestore)
 
         @Provides
         fun toDoListUseCase(toDosRepository: ToDosRepository): GetToDoUseCase =
-                GetToDoUseCase(toDosRepository)
+            GetToDoUseCase(toDosRepository)
 
         @Provides
         fun listsUseCase(listsRepository: ListsRepository): GetListsUseCase =
-                GetListsUseCase(listsRepository)
+            GetListsUseCase(listsRepository)
 
         @Provides
         fun editToDoUseCase(
-                toDosRepository: ToDosRepository,
-                notificationScheduler: NotificationScheduler
+            toDosRepository: ToDosRepository,
+            notificationScheduler: NotificationScheduler
         ): EditTodoUseCase = EditTodoUseCase(toDosRepository, notificationScheduler)
 
         @Provides
         fun workManager(@ApplicationContext context: Context): WorkManager =
-                WorkManager.getInstance(context)
+            WorkManager.getInstance(context)
 
         @Provides
         @UserId
@@ -72,10 +75,17 @@ abstract class MainModule {
 
         @Provides
         fun provideDrawerMapper(): @JvmSuppressWildcards (List<ToDoList>) -> ViewState =
-                DrawerMapper()
+            DrawerMapper()
 
         @Provides
         fun provideUser(): User = User(Firebase.auth.currentUser?.uid!!)
+
+        @Provides
+        fun provideLastVisitedListRepository(): LastVisitedListRepository =
+            FirebaseLastVisitedListRepository(Firebase.firestore)
+
+        @Provides
+        fun provideLastVisitedUseCase(repo: LastVisitedListRepository) = LastVisitedUseCase(repo)
     }
 }
 

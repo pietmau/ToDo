@@ -8,9 +8,7 @@ import com.pppp.usecases.ListsRepository
 import com.pppp.usecases.ListsRepository.Companion.ARCHIVED
 import com.pppp.usecases.ListsRepository.Companion.CREATED
 import com.pppp.usecases.ListsRepository.Companion.DELETED
-import com.pppp.usecases.ListsRepository.Companion.ID
 import com.pppp.usecases.ListsRepository.Companion.LISTS
-import com.pppp.usecases.ListsRepository.Companion.LIST_ID
 import com.pppp.usecases.ListsRepository.Companion.MODIFIED
 import com.pppp.usecases.ListsRepository.Companion.NAME
 import com.pppp.usecases.ListsRepository.Companion.PRIORITY
@@ -18,7 +16,6 @@ import com.pppp.usecases.ListsRepository.Companion.USERS
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class FirebaseListsRepository(

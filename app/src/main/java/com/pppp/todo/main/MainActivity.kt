@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                                 is Content -> MainScreen.Content(
                                     listId = state.listId
                                 )
-                                is None -> Loading.Content()
+                                is None -> Loading.Content() // TODO
                                 is ViewState.Loading -> Loading.Content()
                             }.exaustive
                         },
