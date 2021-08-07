@@ -14,6 +14,7 @@ import com.pppp.todo.main.MainActivityViewModel.Event.Init
 import com.pppp.todo.main.MainActivityViewModel.ViewState.None
 import com.pppp.todo.main.MainActivityViewModel.ViewState.Loading
 import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
+import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
@@ -25,6 +26,9 @@ class MainActivityViewModel @Inject constructor(
     override val _uiStates: MutableStateFlow<ViewState> = MutableStateFlow(Loading)
 
     override val _oneOffEvents: MutableSharedFlow<OneOffEvent> = MutableSharedFlow()
+
+    override val states: StateFlow<ViewState>
+        get() = _uiStates
 
     override fun invoke(event: Event) =
         when (event) {

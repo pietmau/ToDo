@@ -13,7 +13,7 @@ abstract class GenericViewModel<ViewState, Event> : ViewModel(), Consumer<Event>
 
     protected abstract val _uiStates: MutableStateFlow<ViewState>
 
-    val states: StateFlow<ViewState>
+    protected open val states: StateFlow<ViewState>
         get() = _uiStates
 
     protected fun launch(block: suspend () -> Unit) {
