@@ -10,25 +10,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-interface ConfirmOrCancel {
+interface Dialog {
 
     companion object {
 
         @Composable
         fun DialogControls(
-            due: Long?,
-            onTimeDataPicked: (Long?) -> Unit,
             onConfirmClicked: () -> Unit,
-            onCancelClicked: () -> Unit
+            onCancelClicked: () -> Unit,
+            optionalControls: @Composable () -> Unit = { }
         ) {
-            Row {
-                Calendar.Content(due, onTimeDataPicked)
-            }
+            optionalControls()
             Buttons(onCancelClicked, onConfirmClicked)
         }
 
         @Composable
-        fun Buttons(
+        private fun Buttons(
             onCancelClicked: () -> Unit = {},
             onConfirmClicked: () -> Unit = {},
             cancel: String = "Cancel",

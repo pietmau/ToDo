@@ -5,6 +5,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         },
                         topBar = {
                             AppBar.Content {
-                                scaffoldState.toggle()
+                                scaffoldState.toggleDrawer()
                             }
                         }
                     )
@@ -74,7 +75,16 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private suspend fun ScaffoldState.toggle() {
+@ExperimentalMaterialApi
+private suspend fun BottomSheetScaffoldState.toggleDrawer() {
+    if (drawerState.isOpen) {
+        drawerState.close()
+    } else {
+        drawerState.open()
+    }
+}
+
+private suspend fun ScaffoldState.toggleDrawer() {
     if (drawerState.isOpen) {
         drawerState.close()
     } else {

@@ -1,7 +1,8 @@
 package com.pppp.uielements
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -27,7 +29,10 @@ interface BottomSheet {
         fun Content(
             isExpanded: Boolean = false,
             onDismissed: () -> Unit = {},
-            content: @Composable() (ColumnScope.() -> Unit) = {}
+            onConfirmClicked: () -> Unit = {},
+            onCancelClicked: () -> Unit = {},
+            sheetContent: @Composable () -> Unit = {},
+            optionalDialogControls: @Composable () -> Unit = {}
         ) {
             val modalBottomSheetState: ModalBottomSheetState =
                 rememberModalBottomSheetState(initialValue = Hidden)
@@ -43,7 +48,24 @@ interface BottomSheet {
             }
             ModalBottomSheetLayout(
                 sheetState = modalBottomSheetState,
-                sheetContent = content,
+                sheetContent = {
+                    Column(
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = 16.dp,
+                            bottom = 8.dp
+                        ),
+                        content = {
+                            SheetContent(
+                                onConfirmClicked = onConfirmClicked,
+                                onCancelClicked = onCancelClicked,
+                                content = sheetContent,
+                                optionalDialogControls = optionalDialogControls
+                            )
+                        }
+                    )
+                },
                 sheetShape = RoundedCornerShape(4.dp),
                 content = {}
             )
@@ -57,6 +79,24 @@ interface BottomSheet {
                 coroutineScope.launch {
                     onDismissed()
                 }
+            }
+        }
+
+        @ExperimentalComposeUiApi
+        @Composable
+        private fun SheetContent(
+            onConfirmClicked: () -> Unit = {},
+            onCancelClicked: () -> Unit = {},
+            content: @Composable () -> Unit = {},
+            optionalDialogControls: @Composable () -> Unit = {}
+        ) {
+            Column {
+                content()
+                Dialog.DialogControls(
+                    onConfirmClicked = onConfirmClicked,
+                    onCancelClicked = onCancelClicked,
+                    optionalControls = optionalDialogControls
+                )
             }
         }
     }

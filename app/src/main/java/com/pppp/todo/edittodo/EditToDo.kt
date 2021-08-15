@@ -25,7 +25,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
@@ -77,7 +76,7 @@ interface EditItem {
                 onDismissed = {
                     editViewModel(OnBackPressed)
                 },
-                content = {
+                sheetContent = {
                     Content(
                         state = state
                     ) {
