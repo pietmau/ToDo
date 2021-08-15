@@ -69,12 +69,10 @@ fun AddItem(
             )
         },
         optionalDialogControls = {
-            Row {
-                Calendar.Content(
-                    due = viewState.due,
-                    onTimeDataPicked = { viewModel(OnTimeDataPicked(it)) }
-                )
-            }
+            Calendar(
+                due = viewState.due,
+                onTimeDataPicked = { viewModel(OnTimeDataPicked(it)) }
+            )
         }
     )
 }

@@ -1,35 +1,16 @@
 package com.pppp.todo.edittodo
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pppp.todo.R
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
+import com.pppp.todo.edittodo.EditTodoViewEvent.OnDateTimePicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.exaustive
@@ -38,123 +19,60 @@ import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.Calendar
+import com.pppp.uielements.ClosableInputText
 import kotlinx.coroutines.flow.collect
 
-interface EditItem {
-
-    companion object {
-
-        @ExperimentalComposeUiApi
-        @ExperimentalMaterialApi
-        @Composable
-        fun Content(
-            item: ItemBeingEdited = ItemBeingEdited.None,
-            editViewModel: EditViewModel = viewModel<EditViewModel>(),
-            onEvent: (MainViewEvent) -> Unit = {}
-        ) {
-            LaunchedEffect(editViewModel, onEvent) {
-                editViewModel.oneOffEvents.collect {
-                    when (it) {
-                        is OneOffEvents.OnCancel -> onEvent(OnCancel)
-                    }.exaustive
-                }
-            }
-            LaunchedEffect(item) {
-                if (item is ItemBeingEdited.Some) {
-                    editViewModel(
-                        Init(
-                            itemId = item.itemId,
-                            listId = item.listId
-                        )
-                    )
-                }
-            }
-            val state by editViewModel.states.collectAsState()
-
-            BottomSheet(
-                isExpanded = state.isVisible,
-                onDismissed = {
-                    editViewModel(OnBackPressed)
-                },
-                sheetContent = {
-                    Content(
-                        state = state
-                    ) {
-                        editViewModel(it)
-                    }
-                }
-            )
-        }
-
-        @ExperimentalComposeUiApi
-        @Composable
-        private fun Content( // TODO migrate like add todo
-            state: EditTodoViewState = remember {
-                mutableStateOf(EditTodoViewState())
-            }.value,
-            onEvent: (EditTodoViewEvent) -> Unit = {}
-        ) {
-            Column(
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 8.dp
-                )
-            ) {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        TextField(
-                            modifier = Modifier
-                                .weight(1F)
-                                .onKeyEvent {
-                                    if (it.key.keyCode == Key.Back.keyCode) {
-                                        onEvent(OnBackPressed)
-                                    }
-                                    false
-                                },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(onDone = { onEvent(OnDoneClicked) }),
-                            value = state.title,
-                            onValueChange = {
-                                onEvent(OnTextChanged(it))
-                            }
-                        )
-                    }
-                }
-                Row {
-                    val onTimeDataPicked: (Long?) -> Unit = {
-                        onEvent(EditTodoViewEvent.OnDateTimePicked(it))
-                    }
-                    Calendar.Content(state.due, onTimeDataPicked)
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Button(
-                        modifier = Modifier.padding(end = 8.dp, top = 8.dp),
-                        onClick = {
-                            onEvent(OnBackPressed)
-                        }) {
-                        Text(text = stringResource(id = R.string.cancel))
-                    }
-                    Button(
-                        modifier = Modifier.padding(top = 8.dp),
-                        onClick = {
-                            onEvent(OnDoneClicked)
-                        }) {
-                        Text(text = stringResource(id = R.string.save))
-                    }
-                }
-            }
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun EditItem(
+    item: ItemBeingEdited = ItemBeingEdited.None,
+    editViewModel: EditViewModel = viewModel(),
+    onEvent: (MainViewEvent) -> Unit = {}
+) {
+    val state by editViewModel.states.collectAsState()
+    LaunchedEffect(editViewModel, onEvent) {
+        editViewModel.oneOffEvents.collect {
+            when (it) {
+                is OneOffEvents.OnCancel -> onEvent(OnCancel)
+            }.exaustive
         }
     }
+    LaunchedEffect(item) {
+        if (item is ItemBeingEdited.Some) {
+            editViewModel(
+                Init(
+                    itemId = item.itemId,
+                    listId = item.listId
+                )
+            )
+        }
+    }
+
+    BottomSheet(
+        isExpanded = state.isVisible,
+        onDismissed = {
+            editViewModel(OnBackPressed)
+        },
+        onConfirmClicked = {
+            editViewModel(OnDoneClicked)
+        },
+        onCancelClicked = {
+            editViewModel(OnBackPressed)
+        },
+        sheetContent = {
+            ClosableInputText(
+                onBackPressed = { editViewModel(OnBackPressed) },
+                onDoneClicked = { editViewModel(OnDoneClicked) },
+                onTitleChanged = { editViewModel(OnTextChanged(it)) },
+                title = state.title
+            )
+        },
+        optionalDialogControls = {
+                Calendar(
+                    due = state.due,
+                    onTimeDataPicked = { editViewModel(OnDateTimePicked(it)) }
+                )
+        }
+    )
 }
-
-
-
-
-

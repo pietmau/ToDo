@@ -80,7 +80,7 @@ fun MainScreen(
     AddItem(state.addToDo == Showing) {
         viewModel(it)
     }
-    EditItem.Content(state.itemBeingEdited) {
+    EditItem(state.itemBeingEdited) {
         viewModel(it)
     }
 }

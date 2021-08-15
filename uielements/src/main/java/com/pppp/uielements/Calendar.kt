@@ -19,59 +19,53 @@ import androidx.compose.ui.unit.dp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 
-interface Calendar {
-
-    companion object {
-        @Composable
-        fun Content(
-            due: Long? = null,
-            onTimeDataPicked: (Long?) -> Unit = {}
+@Composable
+fun Calendar(
+    due: Long? = null,
+    onTimeDataPicked: (Long?) -> Unit = {}
+) {
+    val dialog = remember { MaterialDialog() }
+    dialog.build {
+        datetimepicker(
+            initialDateTime = due.toLocalDateTime()
         ) {
-            val dialog = remember { MaterialDialog() }
-            dialog.build {
-                datetimepicker(
-                    initialDateTime = due.toLocalDateTime()
-                ) {
-                    onTimeDataPicked(it.toMillis())
-                }
-            }
+            onTimeDataPicked(it.toMillis())
+        }
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(all = 8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .clickable {
+                        dialog.show()
+                    },
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(all = 8.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .clickable {
-                                dialog.show()
-                            },
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Image(
-                            imageVector = Icons.Outlined.DateRange,
-                            contentDescription = "",
-                        )
-                        Text(
-                            text = due.toDueDateText() ?: "Due",
-                            style = MaterialTheme.typography.caption
-                        )
-                    }
-                    due?.let {
-                        Image(
-                            modifier = Modifier
-                                .clickable {
-                                    onTimeDataPicked(null)
-                                },
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = "",
-                        )
-                    }
-                }
+                Image(
+                    imageVector = Icons.Outlined.DateRange,
+                    contentDescription = "",
+                )
+                Text(
+                    text = due.toDueDateText() ?: "Due",
+                    style = MaterialTheme.typography.caption
+                )
+            }
+            due?.let {
+                Image(
+                    modifier = Modifier
+                        .clickable {
+                            onTimeDataPicked(null)
+                        },
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "",
+                )
             }
         }
-
     }
 }
