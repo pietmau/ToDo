@@ -77,7 +77,7 @@ fun MainScreen(
             )
         }
     )
-    AddItem.Content(state.addToDo == Showing) {
+    AddItem(state.addToDo == Showing) {
         viewModel(it)
     }
     EditItem.Content(state.itemBeingEdited) {

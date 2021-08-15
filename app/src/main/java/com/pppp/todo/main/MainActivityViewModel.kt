@@ -3,6 +3,7 @@ package com.pppp.todo.main
 import com.pppp.entities.User
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.main.MainActivityViewModel.Event
+import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListDismissed
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
 import com.pppp.todo.main.MainActivityViewModel.OneOffEvent
 import com.pppp.todo.main.MainActivityViewModel.ViewState
@@ -38,6 +39,7 @@ class MainActivityViewModel @Inject constructor(
     override fun invoke(event: Event) =
         when (event) {
             OnNewListClicked -> emitViewState(state.copy(addNewListIsShowing = true))
+            OnNewListDismissed -> emitViewState(state.copy(addNewListIsShowing = false))
         }
 
     data class ViewState(
@@ -48,6 +50,7 @@ class MainActivityViewModel @Inject constructor(
 
     sealed class Event {
         object OnNewListClicked : Event()
+        object OnNewListDismissed : Event()
     }
 
     sealed class OneOffEvent

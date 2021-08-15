@@ -71,7 +71,7 @@ interface EditItem {
             }
             val state by editViewModel.states.collectAsState()
 
-            BottomSheet.Content(
+            BottomSheet(
                 isExpanded = state.isVisible,
                 onDismissed = {
                     editViewModel(OnBackPressed)

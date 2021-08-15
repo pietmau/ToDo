@@ -24,63 +24,57 @@ import com.pppp.uielements.ClosableInputText
 import kotlinx.coroutines.flow.collect
 import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed as OnBackClicked
 
-interface AddItem {
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun AddItem(
+    isVisible: Boolean = false,
+    onEvent: (MainViewEvent) -> Unit = {},
+) {
+    val viewModel: AddTodoViewModel = viewModel()
+    val viewState by viewModel.states.collectAsState()
 
-    companion object {
-
-        @ExperimentalComposeUiApi
-        @ExperimentalMaterialApi
-        @Composable
-        fun Content(
-            isVisible: Boolean = false,
-            onEvent: (MainViewEvent) -> Unit = {},
-        ) {
-            val viewmodel: AddTodoViewModel = viewModel()
-            val viewState by viewmodel.states.collectAsState()
-
-            LaunchedEffect(onEvent) {
-                viewmodel.oneOffEvents.collect {
-                    when (it) {
-                        is AddToDo -> onEvent(
-                            OnToDoAdded(
-                                title = it.title,
-                                due = it.due
-                            )
-                        )
-                        is OnBackClicked -> onEvent(OnCancel)
-                    }.exaustive
-                }
-            }
-
-            BottomSheet(
-                isExpanded = isVisible,
-                onDismissed = {
-                    viewmodel(OnBackPressed)
-                },
-                onConfirmClicked = {
-                    viewmodel(DoneClicked)
-                },
-                onCancelClicked = {
-                    viewmodel(OnBackPressed)
-                },
-                sheetContent = {
-                    ClosableInputText(
-                        onBackPressed = { viewmodel(OnBackPressed) },
-                        onDoneClicked = { viewmodel(DoneClicked) },
-                        onTitleChanged = { viewmodel(OnTitleChanged(it)) },
-                        title = viewState.title,
-                        isError = viewState.isError
+    LaunchedEffect(onEvent) {
+        viewModel.oneOffEvents.collect {
+            when (it) {
+                is AddToDo -> onEvent(
+                    OnToDoAdded(
+                        title = it.title,
+                        due = it.due
                     )
-                },
-                optionalDialogControls = {
-                    Row {
-                        Calendar.Content(
-                            due = viewState.due,
-                            onTimeDataPicked = { viewmodel(OnTimeDataPicked(it)) }
-                        )
-                    }
-                }
-            )
+                )
+                is OnBackClicked -> onEvent(OnCancel)
+            }.exaustive
         }
     }
+
+    BottomSheet(
+        isExpanded = isVisible,
+        onDismissed = {
+            viewModel(OnBackPressed)
+        },
+        onConfirmClicked = {
+            viewModel(DoneClicked)
+        },
+        onCancelClicked = {
+            viewModel(OnBackPressed)
+        },
+        sheetContent = {
+            ClosableInputText(
+                onBackPressed = { viewModel(OnBackPressed) },
+                onDoneClicked = { viewModel(DoneClicked) },
+                onTitleChanged = { viewModel(OnTitleChanged(it)) },
+                title = viewState.title,
+                isError = viewState.isError
+            )
+        },
+        optionalDialogControls = {
+            Row {
+                Calendar.Content(
+                    due = viewState.due,
+                    onTimeDataPicked = { viewModel(OnTimeDataPicked(it)) }
+                )
+            }
+        }
+    )
 }
