@@ -1,5 +1,6 @@
 package com.pppp.uielements
 
+import androidx.compose.material.ScaffoldState
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
@@ -18,3 +19,12 @@ fun Long?.toDueDateText(): String? =
     } else {
         "Due"
     }
+
+
+suspend fun ScaffoldState.toggleDrawer() {
+    if (drawerState.isOpen) {
+        drawerState.close()
+    } else {
+        drawerState.open()
+    }
+}

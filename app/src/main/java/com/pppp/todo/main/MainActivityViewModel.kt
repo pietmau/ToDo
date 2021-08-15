@@ -3,11 +3,9 @@ package com.pppp.todo.main
 import com.pppp.entities.User
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.main.MainActivityViewModel.Event
+import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
 import com.pppp.todo.main.MainActivityViewModel.OneOffEvent
 import com.pppp.todo.main.MainActivityViewModel.ViewState
-import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
-import com.pppp.todo.main.MainActivityViewModel.ViewState.Loading
-import com.pppp.todo.main.MainActivityViewModel.ViewState.None
 import com.pppp.usecases.main.LastVisitedListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -21,31 +19,32 @@ class MainActivityViewModel @Inject constructor(
 ) :
     GenericViewModelWithOneOffEvents<ViewState, Event, OneOffEvent>() {
 
-    override val _uiStates: MutableStateFlow<ViewState> = MutableStateFlow(Loading)
+    override val _uiStates: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
 
     override val _oneOffEvents: MutableSharedFlow<OneOffEvent> = MutableSharedFlow()
 
     init {
-        start()
-    }
-
-    private fun start() {
         launch {
             val lastListId = lastVisitedListRepository.getLastVisitedList(user.id)
-            val viewState = lastListId?.let { Content(it) } ?: None
-            _uiStates.emit(viewState)
+            _uiStates.emit(
+                state.copy(
+                    isLoading = false,
+                    listId = lastListId
+                )
+            )
         }
     }
 
-    override fun invoke(t: Event) {
+    override fun invoke(event: Event) =
+        when (event) {
+            OnNewListClicked -> emitViewState(state.copy(addNewListIsShowing = true))
+        }
 
-    }
-
-    sealed class ViewState {
-        object Loading : ViewState()
-        object None : ViewState()
-        data class Content(val listId: String) : ViewState()
-    }
+    data class ViewState(
+        val isLoading: Boolean = true,
+        val addNewListIsShowing: Boolean = false,
+        val listId: String? = null
+    )
 
     sealed class Event {
         object OnNewListClicked : Event()

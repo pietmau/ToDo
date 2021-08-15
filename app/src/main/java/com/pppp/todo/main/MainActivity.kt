@@ -5,25 +5,24 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.pppp.todo.drawer.Drawer
-import com.pppp.todo.exaustive
-import com.pppp.todo.main.MainActivityViewModel.ViewState
-import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
-import com.pppp.todo.main.MainActivityViewModel.ViewState.None
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
+import com.pppp.todo.main.MainActivityViewModel.ViewState
 import com.pppp.todo.main.view.AppBar
 import com.pppp.todo.main.view.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
+import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.Loading
+import com.pppp.uielements.toggleDrawer
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,7 +35,6 @@ class MainActivity : ComponentActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val viewModel: MainActivityViewModel by viewModels()
-
         setContent {
             val state = viewModel.states.collectAsState().value
             ToDoTheme {
@@ -45,21 +43,18 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         scaffoldState = scaffoldState,
                         content = {
-                            when (state) {
-                                is Content -> MainScreen.Content(
-                                    listId = state.listId
-                                )
-                                is None -> Loading.Content() // TODO
-                                is ViewState.Loading -> Loading.Content()
-                            }.exaustive
+                            content(state)
                         },
                         drawerContent = {
-                            Drawer.Content(
-                                addListClicked = { viewModel(OnNewListClicked) }
+                            Drawer(
+                                addListClicked = {
+                                    scaffoldState.toggleDrawer()
+                                    viewModel(OnNewListClicked)
+                                }
                             )
                         },
                         topBar = {
-                            AppBar.Content {
+                            AppBar {
                                 scaffoldState.toggleDrawer()
                             }
                         }
@@ -69,25 +64,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @ExperimentalMaterialApi
+    @ExperimentalComposeUiApi
+    @Composable
+    private fun content(state: ViewState) {
+        when {
+            state.isLoading -> Loading()
+            state.listId == null -> Loading()
+            else -> MainScreen(state.listId)
+        }
+        BottomSheet(
+            isExpanded = state.addNewListIsShowing,
+            sheetContent = { Text("Foo") }
+        )
+    }
+
     companion object {
         const val PENDING_INTENT_REQUEST_CODE = 2
 
-    }
-}
-
-@ExperimentalMaterialApi
-private suspend fun BottomSheetScaffoldState.toggleDrawer() {
-    if (drawerState.isOpen) {
-        drawerState.close()
-    } else {
-        drawerState.open()
-    }
-}
-
-private suspend fun ScaffoldState.toggleDrawer() {
-    if (drawerState.isOpen) {
-        drawerState.close()
-    } else {
-        drawerState.open()
     }
 }

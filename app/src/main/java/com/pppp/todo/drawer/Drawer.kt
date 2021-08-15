@@ -25,177 +25,163 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
-interface Drawer {
 
-    companion object {
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
+@Composable
+fun Drawer(
+    currentRoute: String = "",
+    closeDrawer: () -> Unit = {},
+    onRouteChanged: (String) -> Unit = {},
+    viewModel: DrawerViewModel = viewModel(),
+    addListClicked: suspend () -> Unit = {}
+) {
+    val state: State<ViewState> = viewModel.states.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (spacer, divider, lists, addList) = createRefs()
 
-        @ExperimentalMaterialApi
-        @ExperimentalComposeUiApi
-        @Composable
-        fun Content(
-            currentRoute: String = "",
-            closeDrawer: () -> Unit = {},
-            onRouteChanged: (String) -> Unit = {},
-            viewModel: DrawerViewModel = viewModel(),
-            addListClicked: () -> Unit = {}
-        ) {
-            val state: State<ViewState> = viewModel.states.collectAsState()
-
-            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (spacer, divider, lists, addList) = createRefs()
-
-                Spacer(
-                    Modifier
-                        .height(24.dp)
-                        .constrainAs(spacer) {
-                            top.linkTo(parent.top)
-                        }
-                )
-                Divider(
-                    modifier = Modifier.constrainAs(divider) {
-                        top.linkTo(spacer.bottom)
-                    },
-                    color = MaterialTheme.colors.onSurface.copy(alpha = .2f)
-                )
-                Items(
-                    modifier = Modifier
-                        .constrainAs(lists) {
-                            top.linkTo(divider.bottom)
-                        }
-                        .fillMaxHeight(),
-                    items = state.value.lists,
-                    closeDrawer = closeDrawer
-                )
-                AddListRow(
-                    modifier = Modifier
-                        .constrainAs(addList) {
-                            bottom.linkTo(parent.bottom)
-                        },
-                    onClick = addListClicked
-                )
-            }
-        }
-
-        @Composable
-        private fun Items(
-            modifier: Modifier = Modifier,
-            items: List<ViewState.ToDoList> = emptyList(),
-            closeDrawer: () -> Unit = {},
-        ) {
-            LazyColumn(modifier) {
-                items(items) {
-                    DrawerButton(
-                        label = it.name,
-                        isSelected = true,
-                        action = {
-                            closeDrawer()
-                        }
-                    )
+        Spacer(
+            Modifier
+                .height(24.dp)
+                .constrainAs(spacer) {
+                    top.linkTo(parent.top)
+                }
+        )
+        Divider(
+            modifier = Modifier.constrainAs(divider) {
+                top.linkTo(spacer.bottom)
+            },
+            color = MaterialTheme.colors.onSurface.copy(alpha = .2f)
+        )
+        Items(
+            modifier = Modifier
+                .constrainAs(lists) {
+                    top.linkTo(divider.bottom)
+                }
+                .fillMaxHeight(),
+            items = state.value.lists,
+            closeDrawer = closeDrawer
+        )
+        AddListRow(
+            modifier = Modifier
+                .constrainAs(addList) {
+                    bottom.linkTo(parent.bottom)
+                },
+            onClick = {
+                coroutineScope.launch {
+                    addListClicked()
                 }
             }
-        }
+        )
+    }
+}
 
-        @Composable
-        private fun AddListRow(
-            modifier: Modifier = Modifier,
-            onClick: () -> Unit = {}
-        ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onClick()
-                    },
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Add list",
-                    style = MaterialTheme.typography.body2,
-                )
-                Image(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(32.dp),
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = null
-                )
-            }
-        }
-
-        @Composable
-        private fun DrawerButton(
-            label: String,
-            isSelected: Boolean,
-            action: () -> Unit,
-            modifier: Modifier = Modifier
-        ) {
-            val colors = MaterialTheme.colors
-            val imageAlpha = if (isSelected) {
-                1f
-            } else {
-                0.6f
-            }
-            val textIconColor = if (isSelected) {
-                colors.primary
-            } else {
-                colors.onSurface.copy(alpha = 0.6f)
-            }
-            val backgroundColor = if (isSelected) {
-                colors.primary.copy(alpha = 0.12f)
-            } else {
-                Color.Transparent
-            }
-
-            val surfaceModifier = modifier
-                .padding(start = 8.dp, top = 8.dp, end = 8.dp)
-                .fillMaxWidth()
-            Surface(
-                modifier = surfaceModifier,
-                color = backgroundColor,
-                shape = MaterialTheme.shapes.small
-            ) {
-                TextButton(
-                    onClick = action,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Spacer(Modifier.width(16.dp))
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.body2,
-                            color = textIconColor
-                        )
-                    }
+@Composable
+private fun Items(
+    modifier: Modifier = Modifier,
+    items: List<ViewState.ToDoList> = emptyList(),
+    closeDrawer: () -> Unit = {},
+) {
+    LazyColumn(modifier) {
+        items(items) {
+            DrawerButton(
+                label = it.name,
+                isSelected = true,
+                action = {
+                    closeDrawer()
                 }
-            }
+            )
         }
     }
 }
 
-@ExperimentalComposeUiApi
-@ExperimentalMaterialApi
-@Preview
 @Composable
-fun DrawerPreview() {
-    val state =
-        remember { mutableStateOf(ViewState(lists = listOf(ViewState.ToDoList(name = "Foo")))) }
-    Drawer.Content()
+private fun AddListRow(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Add list",
+            style = MaterialTheme.typography.body2,
+        )
+        Image(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(32.dp),
+            imageVector = Icons.Outlined.Add,
+            contentDescription = null
+        )
+    }
 }
-    
-    
+
+@Composable
+private fun DrawerButton(
+    label: String,
+    isSelected: Boolean,
+    action: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val colors = MaterialTheme.colors
+    val imageAlpha = if (isSelected) {
+        1f
+    } else {
+        0.6f
+    }
+    val textIconColor = if (isSelected) {
+        colors.primary
+    } else {
+        colors.onSurface.copy(alpha = 0.6f)
+    }
+    val backgroundColor = if (isSelected) {
+        colors.primary.copy(alpha = 0.12f)
+    } else {
+        Color.Transparent
+    }
+
+    val surfaceModifier = modifier
+        .padding(start = 8.dp, top = 8.dp, end = 8.dp)
+        .fillMaxWidth()
+    Surface(
+        modifier = surfaceModifier,
+        color = backgroundColor,
+        shape = MaterialTheme.shapes.small
+    ) {
+        TextButton(
+            onClick = action,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(Modifier.width(16.dp))
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.body2,
+                    color = textIconColor
+                )
+            }
+        }
+    }
+}

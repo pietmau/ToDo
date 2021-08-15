@@ -9,28 +9,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
-interface AppBar {
-
-    companion object {
-        @Composable
-        fun Content(
-            onNavigationItemClick: suspend () -> Unit = {}
-        ) {
-            TopAppBar {
-                val scope = rememberCoroutineScope()
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            onNavigationItemClick()
-                        }
-                    },
-                    content = {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null
-                        )
-                    })
-            }
-        }
+@Composable
+fun AppBar(
+    onNavigationItemClick: suspend () -> Unit = {}
+) {
+    TopAppBar {
+        val scope = rememberCoroutineScope()
+        IconButton(
+            onClick = {
+                scope.launch {
+                    onNavigationItemClick()
+                }
+            },
+            content = {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = null
+                )
+            })
     }
 }
+
