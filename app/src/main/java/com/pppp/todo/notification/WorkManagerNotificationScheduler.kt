@@ -4,7 +4,7 @@ import androidx.work.Data
 import androidx.work.ExistingWorkPolicy.REPLACE
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.pppp.todo.calculateDelay
+import com.pppp.todo.utils.calculateDelay
 import com.pppp.usecases.notification.NotificationScheduler
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

@@ -8,7 +8,7 @@ abstract class GenericViewModelWithOneOffEvents<ViewState, Event, OneOffEvent> :
     protected abstract val _oneOffEvents: MutableSharedFlow<OneOffEvent>
 
     val oneOffEvents: Flow<OneOffEvent>
-        get() = _oneOffEvents
+        get() = _oneOffEvents.onSubscription {  }
 
     protected fun emitOneOffEvent(event: OneOffEvent) {
         launch { _oneOffEvents.emit(event) }

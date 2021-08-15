@@ -18,6 +18,7 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainActivityViewModel.ViewState
 import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
 import com.pppp.todo.main.MainActivityViewModel.ViewState.None
+import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
 import com.pppp.todo.main.view.AppBar
 import com.pppp.todo.main.view.MainScreen
 import com.pppp.todo.ui.theme.ToDoTheme
@@ -53,7 +54,7 @@ class MainActivity : ComponentActivity() {
                         },
                         drawerContent = {
                             Drawer.Content(
-                                addListClicked = {}
+                                addListClicked = { viewModel(OnNewListClicked) }
                             )
                         },
                         topBar = {

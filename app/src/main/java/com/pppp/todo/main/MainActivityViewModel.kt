@@ -2,19 +2,17 @@ package com.pppp.todo.main
 
 import com.pppp.entities.User
 import com.pppp.todo.GenericViewModelWithOneOffEvents
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.pppp.todo.main.MainActivityViewModel.Event
 import com.pppp.todo.main.MainActivityViewModel.OneOffEvent
 import com.pppp.todo.main.MainActivityViewModel.ViewState
-import com.pppp.todo.main.MainActivityViewModel.Event
+import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
+import com.pppp.todo.main.MainActivityViewModel.ViewState.Loading
+import com.pppp.todo.main.MainActivityViewModel.ViewState.None
 import com.pppp.usecases.main.LastVisitedListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import com.pppp.todo.main.MainActivityViewModel.Event.Init
-import com.pppp.todo.main.MainActivityViewModel.ViewState.None
-import com.pppp.todo.main.MainActivityViewModel.ViewState.Loading
-import com.pppp.todo.main.MainActivityViewModel.ViewState.Content
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
@@ -27,13 +25,9 @@ class MainActivityViewModel @Inject constructor(
 
     override val _oneOffEvents: MutableSharedFlow<OneOffEvent> = MutableSharedFlow()
 
-    override val states: StateFlow<ViewState>
-        get() = _uiStates
-
-    override fun invoke(event: Event) =
-        when (event) {
-            is Init -> start()
-        }
+    init {
+        start()
+    }
 
     private fun start() {
         launch {
@@ -43,6 +37,10 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    override fun invoke(t: Event) {
+
+    }
+
     sealed class ViewState {
         object Loading : ViewState()
         object None : ViewState()
@@ -50,7 +48,7 @@ class MainActivityViewModel @Inject constructor(
     }
 
     sealed class Event {
-        object Init : Event()
+        object OnNewListClicked : Event()
     }
 
     sealed class OneOffEvent
