@@ -40,6 +40,7 @@ class MainActivityViewModel @Inject constructor(
         when (event) {
             OnNewListClicked -> emitViewState(state.copy(addNewListIsShowing = true))
             OnNewListDismissed -> emitViewState(state.copy(addNewListIsShowing = false))
+            Event.OnDrawerOpened -> TODO()
         }
 
     data class ViewState(

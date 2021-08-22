@@ -11,13 +11,11 @@ import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
 import com.pppp.todo.drawer.Drawer
-import com.pppp.todo.main.MainActivityViewModel.Event.OnDrawerOpened
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListDismissed
 import com.pppp.todo.main.view.AppBar
@@ -66,7 +64,7 @@ class MainActivity : ComponentActivity() {
                         },
                         topBar = {
                             AppBar {
-                                mainViewModel(OnDrawerOpened)
+                                //mainViewModel(OnDrawerOpened)
                                 scaffoldState.toggleDrawer()
                             }
                         }
