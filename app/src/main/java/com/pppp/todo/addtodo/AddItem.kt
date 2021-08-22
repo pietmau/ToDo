@@ -1,6 +1,5 @@
-package com.pppp.todo.main.view
+package com.pppp.todo.addtodo
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.pppp.todo.addtodo.AddTodoViewModel
 import com.pppp.todo.addtodo.Event.DoneClicked
 import com.pppp.todo.addtodo.Event.OnBackPressed
 import com.pppp.todo.addtodo.Event.OnTimeDataPicked
@@ -64,7 +62,7 @@ fun AddItem(
                 onBackPressed = { viewModel(OnBackPressed) },
                 onDoneClicked = { viewModel(DoneClicked) },
                 onTitleChanged = { viewModel(OnTitleChanged(it)) },
-                title = viewState.title,
+                text = viewState.title,
                 isError = viewState.isError
             )
         },

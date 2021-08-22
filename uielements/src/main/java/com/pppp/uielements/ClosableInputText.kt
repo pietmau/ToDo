@@ -3,6 +3,7 @@ package com.pppp.uielements
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,8 +20,10 @@ fun ClosableInputText(
     onBackPressed: () -> Unit = {},
     onDoneClicked: () -> Unit = {},
     onTitleChanged: (String) -> Unit = { _: String -> },
-    title: String = "",
-    isError: Boolean = false
+    text: String = "",
+    isError: Boolean = false,
+    label: String? = null,
+    placeHolder: String? = null
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextField(
@@ -36,9 +39,11 @@ fun ClosableInputText(
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(onDone = { onDoneClicked() }),
-            value = title,
+            value = text,
             onValueChange = onTitleChanged,
-            isError = isError
+            isError = isError,
+            label = { label?.let { Text(it) } },
+            placeholder = { placeHolder?.let { Text(it) } },
         )
     }
 }

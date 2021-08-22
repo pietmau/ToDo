@@ -51,6 +51,7 @@ class MainActivityViewModel @Inject constructor(
     sealed class Event {
         object OnNewListClicked : Event()
         object OnNewListDismissed : Event()
+        object OnDrawerOpened : Event()
     }
 
     sealed class OneOffEvent

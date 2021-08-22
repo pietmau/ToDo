@@ -1,6 +1,5 @@
 package com.pppp.todo.edittodo
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,7 +64,7 @@ fun EditItem(
                 onBackPressed = { editViewModel(OnBackPressed) },
                 onDoneClicked = { editViewModel(OnDoneClicked) },
                 onTitleChanged = { editViewModel(OnTextChanged(it)) },
-                title = state.title
+                text = state.title
             )
         },
         optionalDialogControls = {
@@ -73,6 +72,6 @@ fun EditItem(
                     due = state.due,
                     onTimeDataPicked = { editViewModel(OnDateTimePicked(it)) }
                 )
-        }
+        },
     )
 }

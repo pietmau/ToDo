@@ -9,11 +9,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.R
 import com.pppp.todo.drawer.Drawer
-import com.pppp.todo.drawer.Event
+import com.pppp.todo.main.MainActivityViewModel.Event.OnDrawerOpened
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListClicked
 import com.pppp.todo.main.MainActivityViewModel.Event.OnNewListDismissed
 import com.pppp.todo.main.view.AppBar
@@ -33,9 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-
         setContent {
-
             ToDoTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     val mainViewModel: MainActivityViewModel = viewModel()
@@ -44,17 +46,14 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         scaffoldState = scaffoldState,
                         content = {
-                            when {
-                                state.isLoading -> Loading()
-                                state.listId == null -> Loading()
-                                else -> MainScreen(state.listId)
-                            }
+                            MainContent(state)
                             BottomSheet(
                                 isExpanded = state.addNewListIsShowing,
-                                sheetContent = { ClosableInputText() },
                                 onDismissed = { mainViewModel(OnNewListDismissed) },
+                                onConfirmClicked = {},
                                 onCancelClicked = { mainViewModel(OnNewListDismissed) },
-                                onConfirmClicked = {}
+                                sheetContent = { ClosableInputText() },
+                                title = stringResource(id = R.string.create_new_list)
                             )
                         },
                         drawerContent = {
@@ -67,12 +66,24 @@ class MainActivity : ComponentActivity() {
                         },
                         topBar = {
                             AppBar {
+                                mainViewModel(OnDrawerOpened)
                                 scaffoldState.toggleDrawer()
                             }
                         }
                     )
                 }
             }
+        }
+    }
+
+    @ExperimentalMaterialApi
+    @ExperimentalComposeUiApi
+    @Composable
+    private fun MainContent(state: MainActivityViewModel.ViewState) {
+        when {
+            state.isLoading -> Loading()
+            state.listId == null -> Loading()
+            else -> MainScreen(state.listId)
         }
     }
 
