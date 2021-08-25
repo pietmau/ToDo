@@ -2,7 +2,7 @@ package com.pppp.todo.main.viewmodel
 
 sealed class MainViewEvent {
 
-    data class GetList(val toDoList: String) : MainViewEvent()
+    data class GetList(val toDoList: String?) : MainViewEvent()
 
     data class OnEditToDoClicked(val itemId: String, val listId: String) : MainViewEvent()
 

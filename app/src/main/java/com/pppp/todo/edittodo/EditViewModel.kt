@@ -61,7 +61,6 @@ class EditViewModel @Inject constructor(
     private fun onDoneClicked() = launch {
         editTodoUseCase.invoke(
             EditTodoUseCase.Params.Edit(
-                userId = user.id,
                 listId = currentItem?.listId!!,
                 itemId = currentItem?.id!!,
                 values = state.toValueMap()

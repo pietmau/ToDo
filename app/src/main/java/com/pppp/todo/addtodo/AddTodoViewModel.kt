@@ -2,6 +2,7 @@ package com.pppp.todo.addtodo
 
 import com.pppp.todo.GenericViewModelWithOneOffEvents
 import com.pppp.todo.addtodo.Event.DoneClicked
+import com.pppp.todo.addtodo.Event.Init
 import com.pppp.todo.addtodo.Event.OnBackPressed
 import com.pppp.todo.addtodo.Event.OnTimeDataPicked
 import com.pppp.todo.addtodo.Event.OnTitleChanged
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class AddTodoViewModel @Inject constructor() :
     GenericViewModelWithOneOffEvents<ViewState, Event, OneOffEvent>() {
 
+    private lateinit var listId: String
+
     override val _uiStates: MutableStateFlow<ViewState> = MutableStateFlow(ViewState())
 
     override val _oneOffEvents: MutableSharedFlow<OneOffEvent> = MutableSharedFlow()
@@ -25,6 +28,7 @@ class AddTodoViewModel @Inject constructor() :
             is OnTitleChanged -> onTitleChanged(event)
             is OnTimeDataPicked -> onTimeDataPicked(event.due)
             is OnBackPressed -> onBackPressed()
+            is Init -> this.listId = event.listId
         }
 
     private fun onBackPressed() {
@@ -45,7 +49,7 @@ class AddTodoViewModel @Inject constructor() :
         }
 
     private fun addTodo() {
-        emitOneOffEvent(AddToDo(title = state.title, due = state.due))
+        emitOneOffEvent(AddToDo(title = state.title, due = state.due, listId = listId))
         clearState()
     }
 
@@ -63,7 +67,7 @@ sealed class Event {
     object OnBackPressed : Event()
     data class OnTitleChanged(val title: String) : Event()
     data class OnTimeDataPicked(val due: Long?) : Event()
-    data class Init()
+    data class Init(val listId: String) : Event()
 }
 
 sealed class OneOffEvent {

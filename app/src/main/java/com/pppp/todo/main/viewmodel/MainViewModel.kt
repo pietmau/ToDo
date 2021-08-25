@@ -39,7 +39,10 @@ class MainViewModel @Inject constructor(
             is OnEditToDoClicked -> TODO()
         }
 
-    private fun getList(userId: String, listId: String) {
+    private fun getList(userId: String, listId: String?) {
+        if (listId.isNullOrEmpty()) {
+            return
+        }
         this.listId = listId
         launch {
             getToDoUseCase(GetList(userId, listId)).collect {
@@ -52,7 +55,6 @@ class MainViewModel @Inject constructor(
         launch {
             editTodoUseCase(
                 Edit(
-                    userId = user.id,
                     listId = listId,
                     itemId = itemId,
                     values = mapOf(COMPLETED to completed)
@@ -62,6 +64,6 @@ class MainViewModel @Inject constructor(
 
     private fun addToDo(title: String, due: Long?) =
         launch {
-            editTodoUseCase(Add(userId = user.id, listId = listId, title = title, due = due))
+            editTodoUseCase(Add(listId = listId, title = title, due = due))
         }
 }

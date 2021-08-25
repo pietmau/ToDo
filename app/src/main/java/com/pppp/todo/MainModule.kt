@@ -62,8 +62,9 @@ abstract class MainModule {
         @Provides
         fun editToDoUseCase(
             toDosRepository: ToDosRepository,
-            notificationScheduler: NotificationScheduler
-        ): EditTodoUseCase = EditTodoUseCase(toDosRepository, notificationScheduler)
+            notificationScheduler: NotificationScheduler,
+            @UserId userId: String
+        ): EditTodoUseCase = EditTodoUseCase(toDosRepository, notificationScheduler, userId)
 
         @Provides
         fun workManager(@ApplicationContext context: Context): WorkManager =

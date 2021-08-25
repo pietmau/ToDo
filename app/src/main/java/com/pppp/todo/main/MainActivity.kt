@@ -13,6 +13,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -52,31 +55,13 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         scaffoldState = scaffoldState,
                         content = {
-                            MainContent { listId, itemId ->
+                            MainContent(listId = state.listId) { listId, itemId ->
                                 mainViewModel(
                                     OnEditClicked(
                                         listId = listId,
                                         itemId = itemId
                                     )
                                 )
-                            }
-                            AddList(state, mainViewModel)
-                            AddItem(
-                                isVisible = state.addNewItemIsShowing,
-                                onToDoAdded = { listId, title, due ->
-                                    mainViewModel(
-                                        OnToDoAdded(
-                                            listId = listId,
-                                            title = title,
-                                            due = due
-                                        )
-                                    )
-
-                                },
-                                onBackPressed = { mainViewModel.invoke(OnNewItemDismissed) }
-                            )
-                            EditItem(state.itemBeingEdited) {
-                                mainViewModel.invoke(OnEditDismissed)
                             }
                         },
                         drawerContent = {
@@ -95,6 +80,7 @@ class MainActivity : ComponentActivity() {
                         },
                         floatingActionButton = {
                             Fab(onClick = {
+                                mainViewModel.invoke(MainActivityViewModel.Event.OnNewItemClicked)
                             })
                         },
                         isFloatingActionButtonDocked = true,
@@ -102,6 +88,27 @@ class MainActivity : ComponentActivity() {
                             BottomAppBar {}
                         },
                     )
+                    AddList(
+                        state.addNewListIsShowing,
+                        onCancel = { mainViewModel(OnNewListDismissed) })
+                    AddItem(
+                        listId = state.listId,
+                        isVisible = state.addNewItemIsShowing,
+                        onToDoAdded = { listId, title, due ->
+                            mainViewModel(
+                                OnToDoAdded(
+                                    listId = listId,
+                                    title = title,
+                                    due = due
+                                )
+                            )
+
+                        },
+                        onBackPressed = { mainViewModel.invoke(OnNewItemDismissed) }
+                    )
+                    EditItem(state.itemBeingEdited) {
+                        mainViewModel.invoke(OnEditDismissed)
+                    }
                 }
             }
         }
@@ -111,20 +118,27 @@ class MainActivity : ComponentActivity() {
     @ExperimentalComposeUiApi
     @Composable
     private fun AddList(
-        state: MainActivityViewModel.ViewState,
-        mainViewModel: MainActivityViewModel
+        isShowing: Boolean = false,
+        onCancel: () -> Unit = {}
     ) {
+        var text by rememberSaveable { mutableStateOf(EMPTY_STRING) }
         BottomSheet(
-            isExpanded = state.addNewListIsShowing,
-            onDismissed = { mainViewModel(OnNewListDismissed) },
+            isExpanded = isShowing,
+            onDismissed = onCancel,
             onConfirmClicked = {},
-            onCancelClicked = { mainViewModel(OnNewListDismissed) },
-            sheetContent = { ClosableInputText() },
+            onCancelClicked = onCancel,
+            sheetContent = {
+                ClosableInputText(
+                    text = text,
+                    onTitleChanged = { text = it }
+                )
+            },
             title = stringResource(id = R.string.create_new_list)
         )
     }
 
     companion object {
         const val PENDING_INTENT_REQUEST_CODE = 2
+        private const val EMPTY_STRING = ""
     }
 }

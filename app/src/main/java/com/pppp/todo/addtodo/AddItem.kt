@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.addtodo.Event.Init
 import com.pppp.todo.addtodo.Event.DoneClicked
 import com.pppp.todo.addtodo.Event.OnBackPressed
 import com.pppp.todo.addtodo.Event.OnTimeDataPicked
@@ -24,15 +25,16 @@ import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed as OnBackClicked
 @Composable
 fun AddItem(
     isVisible: Boolean = false,
-    listId: String = "",
+    listId: String? = null,
     onToDoAdded: (listId: String, title: String, due: Long?) -> Unit = { _, _, _ -> },
     onBackPressed: () -> Unit = {}
 ) {
+    listId ?: return
     val addTodoViewModel: AddTodoViewModel = viewModel()
     val viewState by addTodoViewModel.states.collectAsState()
 
     LaunchedEffect(Unit) {
-        addTodoViewModel.invoke()
+        addTodoViewModel(Init(listId))
         addTodoViewModel.oneOffEvents.collect {
             when (it) {
                 is AddToDo -> onToDoAdded(it.listId, it.title, it.due)

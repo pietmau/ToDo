@@ -33,7 +33,7 @@ fun Fab(onClick: () -> Unit) {
 
 @Composable
 internal fun MainContent(
-    listId: String = "",
+    listId: String? = null,
     viewModel: GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent> =
         viewModel<MainViewModel>(),
     onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }

@@ -1,6 +1,5 @@
 package com.pppp.database
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,7 +12,6 @@ import com.pppp.usecases.ToDosRepository.Companion.CREATED
 import com.pppp.usecases.ToDosRepository.Companion.DUE
 import com.pppp.usecases.ToDosRepository.Companion.EMPTY_STRING
 import com.pppp.usecases.ToDosRepository.Companion.LISTS
-import com.pppp.usecases.ToDosRepository.Companion.LIST_ID
 import com.pppp.usecases.ToDosRepository.Companion.STARRED
 import com.pppp.usecases.ToDosRepository.Companion.TITLE
 import com.pppp.usecases.ToDosRepository.Companion.TODOS
