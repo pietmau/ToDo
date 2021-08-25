@@ -18,10 +18,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-        private val editTodoUseCase: EditTodoUseCase,
-        private val getToDoUseCase: GetToDoUseCase,
-        private val mapper: @JvmSuppressWildcards (List<ToDo>) -> MainViewState,
-        private val user: User
+    private val editTodoUseCase: EditTodoUseCase,
+    private val getToDoUseCase: GetToDoUseCase,
+    private val mapper: @JvmSuppressWildcards (List<ToDo>) -> MainViewState,
+    private val user: User
 ) : GenericViewModelWithOneOffEvents<MainViewState, MainViewEvent, OneOffEvent>() {
     private lateinit var listId: String
 
@@ -30,14 +30,14 @@ class MainViewModel @Inject constructor(
     override val _oneOffEvents = MutableSharedFlow<OneOffEvent>()
 
     override fun invoke(event: MainViewEvent) =
-            when (event) {
-                is OnToDoAdded -> addToDo(event.title, event.due)
-                is OnToDoCompleted -> completeToDo(event.listId, event.itemId, event.completed)
-                is OnAddToDoClicked -> onAddToDoClicked()
-                is OnEditToDoClicked -> onEditClicked(event.listId, event.itemId)
-                is OnCancel -> onCancel()
-                is MainViewEvent.GetList -> getList(user.id, event.toDoList)
-            }
+        when (event) {
+            is OnToDoAdded -> addToDo(event.title, event.due)
+            is OnToDoCompleted -> completeToDo(event.listId, event.itemId, event.completed)
+            is OnAddToDoClicked -> TODO()
+            is OnCancel -> TODO()
+            is MainViewEvent.GetList -> getList(user.id, event.toDoList)
+            is OnEditToDoClicked -> TODO()
+        }
 
     private fun getList(userId: String, listId: String) {
         this.listId = listId
@@ -48,26 +48,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun onCancel() =
-            emitViewState(state.copy(itemBeingEdited = ItemBeingEdited.None, addToDo = AddToDo.Hidden))
-
-    private fun onEditClicked(listId: String, itemId: String) =
-            emitViewState(state.copy(itemBeingEdited = ItemBeingEdited.Some(listId = listId, itemId = itemId)))
-
-    private fun onAddToDoClicked() = emitViewState(state.copy(addToDo = AddToDo.Showing))
-
     private fun completeToDo(listId: String, itemId: String, completed: Boolean) =
-            launch {
-                editTodoUseCase(
-                        Edit(
-                                userId = user.id,
-                                listId = listId,
-                                itemId = itemId,
-                                values = mapOf(COMPLETED to completed)))
-            }
+        launch {
+            editTodoUseCase(
+                Edit(
+                    userId = user.id,
+                    listId = listId,
+                    itemId = itemId,
+                    values = mapOf(COMPLETED to completed)
+                )
+            )
+        }
 
     private fun addToDo(title: String, due: Long?) =
-            launch {
-                editTodoUseCase(Add(userId = user.id, listId = listId, title = title, due = due))
-            }
+        launch {
+            editTodoUseCase(Add(userId = user.id, listId = listId, title = title, due = due))
+        }
 }

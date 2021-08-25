@@ -13,7 +13,9 @@ import com.pppp.todo.edittodo.EditTodoViewEvent.OnDateTimePicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDoneClicked
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnTextChanged
 import com.pppp.todo.exaustive
-import com.pppp.todo.main.viewmodel.ItemBeingEdited
+import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem
+import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem.None
+import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem.Some
 import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
@@ -25,24 +27,25 @@ import kotlinx.coroutines.flow.collect
 @ExperimentalMaterialApi
 @Composable
 fun EditItem(
-    item: ItemBeingEdited = ItemBeingEdited.None,
+    itemBeingEdited: EditItem = None,
     editViewModel: EditViewModel = viewModel(),
-    onEvent: (MainViewEvent) -> Unit = {}
+    onCancel: () -> Unit = {}
 ) {
     val state by editViewModel.states.collectAsState()
-    LaunchedEffect(editViewModel, onEvent) {
+
+    LaunchedEffect(editViewModel, onCancel) {
         editViewModel.oneOffEvents.collect {
             when (it) {
-                is OneOffEvents.OnCancel -> onEvent(OnCancel)
+                is OneOffEvents.OnCancel -> onCancel()
             }.exaustive
         }
     }
-    LaunchedEffect(item) {
-        if (item is ItemBeingEdited.Some) {
+    LaunchedEffect(itemBeingEdited) {
+        if (itemBeingEdited is Some) {
             editViewModel(
                 Init(
-                    itemId = item.itemId,
-                    listId = item.listId
+                    itemId = itemBeingEdited.itemId,
+                    listId = itemBeingEdited.listId
                 )
             )
         }
@@ -68,10 +71,10 @@ fun EditItem(
             )
         },
         optionalDialogControls = {
-                Calendar(
-                    due = state.due,
-                    onTimeDataPicked = { editViewModel(OnDateTimePicked(it)) }
-                )
+            Calendar(
+                due = state.due,
+                onTimeDataPicked = { editViewModel(OnDateTimePicked(it)) }
+            )
         },
     )
 }

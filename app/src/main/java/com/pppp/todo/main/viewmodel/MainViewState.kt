@@ -5,20 +5,8 @@ import com.pppp.entities.ToDo
 data class MainViewState(
         val isLoading: Boolean = true,
         val todos: List<ToDoViewModel> = emptyList(),
-        val error: ErrorMessage? = null,
-        val itemBeingEdited: ItemBeingEdited = ItemBeingEdited.None,
-        val addToDo: AddToDo = AddToDo.Hidden
+        val error: ErrorMessage? = null
 )
-
-sealed class ItemBeingEdited {
-    object None : ItemBeingEdited()
-    data class Some(val itemId: String, val listId: String) : ItemBeingEdited()
-}
-
-sealed class AddToDo {
-    object Hidden : AddToDo()
-    object Showing : AddToDo()
-}
 
 data class ToDoViewModel(
         val listId: String,

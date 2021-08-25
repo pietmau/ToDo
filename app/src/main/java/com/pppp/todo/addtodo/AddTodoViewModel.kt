@@ -1,15 +1,15 @@
 package com.pppp.todo.addtodo
 
 import com.pppp.todo.GenericViewModelWithOneOffEvents
+import com.pppp.todo.addtodo.Event.DoneClicked
+import com.pppp.todo.addtodo.Event.OnBackPressed
+import com.pppp.todo.addtodo.Event.OnTimeDataPicked
+import com.pppp.todo.addtodo.Event.OnTitleChanged
+import com.pppp.todo.addtodo.OneOffEvent.AddToDo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
-import com.pppp.todo.addtodo.Event.DoneClicked
-import com.pppp.todo.addtodo.Event.OnTitleChanged
-import com.pppp.todo.addtodo.Event.OnTimeDataPicked
-import com.pppp.todo.addtodo.OneOffEvent.AddToDo
-import com.pppp.todo.addtodo.Event.OnBackPressed
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @HiltViewModel
 class AddTodoViewModel @Inject constructor() :
@@ -63,10 +63,11 @@ sealed class Event {
     object OnBackPressed : Event()
     data class OnTitleChanged(val title: String) : Event()
     data class OnTimeDataPicked(val due: Long?) : Event()
+    data class Init()
 }
 
 sealed class OneOffEvent {
-    data class AddToDo(val title: String, val due: Long? = null) : OneOffEvent()
+    data class AddToDo(val listId: String, val title: String, val due: Long? = null) : OneOffEvent()
     object OnBackPressed : OneOffEvent()
 }
 

@@ -11,7 +11,7 @@ import org.junit.Test
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
-class MainScreenKtTest {
+class ToDoListKtTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
     private val viewModel = TestViewModel()
@@ -19,7 +19,7 @@ class MainScreenKtTest {
     @Test
     fun when_bar_then_fobar() {
         composeTestRule.setContent {
-            Content()
+            MainContent()
         }
         viewModel._uiStates.tryEmit(MainViewState(todos = listOf(ToDoViewModel("", "", "Title"))))
     }

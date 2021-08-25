@@ -10,10 +10,10 @@ import androidx.compose.ui.unit.dp
 import com.pppp.todo.main.viewmodel.MainViewState
 
 @Composable
-fun ListOfToDos(
-        mainViewState: MainViewState,
-        onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> },
-        onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> }
+fun ToDoList(
+    mainViewState: MainViewState,
+    onEditToDoClicked: (listId: String, itemId: String) -> Unit = { _, _ -> },
+    onToDoChecked: (listId: String, itemId: String, checked: Boolean) -> Unit = { _, _, _ -> }
 ) {
     LazyColumn(
             Modifier

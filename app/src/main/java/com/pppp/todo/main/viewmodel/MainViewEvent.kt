@@ -1,7 +1,5 @@
 package com.pppp.todo.main.viewmodel
 
-import com.pppp.entities.ToDoList
-
 sealed class MainViewEvent {
 
     data class GetList(val toDoList: String) : MainViewEvent()

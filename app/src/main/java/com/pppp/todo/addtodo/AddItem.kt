@@ -13,9 +13,6 @@ import com.pppp.todo.addtodo.Event.OnTimeDataPicked
 import com.pppp.todo.addtodo.Event.OnTitleChanged
 import com.pppp.todo.addtodo.OneOffEvent.AddToDo
 import com.pppp.todo.exaustive
-import com.pppp.todo.main.viewmodel.MainViewEvent
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
-import com.pppp.todo.main.viewmodel.MainViewEvent.OnToDoAdded
 import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.Calendar
 import com.pppp.uielements.ClosableInputText
@@ -27,21 +24,19 @@ import com.pppp.todo.addtodo.OneOffEvent.OnBackPressed as OnBackClicked
 @Composable
 fun AddItem(
     isVisible: Boolean = false,
-    onEvent: (MainViewEvent) -> Unit = {},
+    listId: String = "",
+    onToDoAdded: (listId: String, title: String, due: Long?) -> Unit = { _, _, _ -> },
+    onBackPressed: () -> Unit = {}
 ) {
-    val viewModel: AddTodoViewModel = viewModel()
-    val viewState by viewModel.states.collectAsState()
+    val addTodoViewModel: AddTodoViewModel = viewModel()
+    val viewState by addTodoViewModel.states.collectAsState()
 
-    LaunchedEffect(onEvent) {
-        viewModel.oneOffEvents.collect {
+    LaunchedEffect(Unit) {
+        addTodoViewModel.invoke()
+        addTodoViewModel.oneOffEvents.collect {
             when (it) {
-                is AddToDo -> onEvent(
-                    OnToDoAdded(
-                        title = it.title,
-                        due = it.due
-                    )
-                )
-                is OnBackClicked -> onEvent(OnCancel)
+                is AddToDo -> onToDoAdded(it.listId, it.title, it.due)
+                is OnBackClicked -> onBackPressed()
             }.exaustive
         }
     }
@@ -49,19 +44,19 @@ fun AddItem(
     BottomSheet(
         isExpanded = isVisible,
         onDismissed = {
-            viewModel(OnBackPressed)
+            addTodoViewModel(OnBackPressed)
         },
         onConfirmClicked = {
-            viewModel(DoneClicked)
+            addTodoViewModel(DoneClicked)
         },
         onCancelClicked = {
-            viewModel(OnBackPressed)
+            addTodoViewModel(OnBackPressed)
         },
         sheetContent = {
             ClosableInputText(
-                onBackPressed = { viewModel(OnBackPressed) },
-                onDoneClicked = { viewModel(DoneClicked) },
-                onTitleChanged = { viewModel(OnTitleChanged(it)) },
+                onBackPressed = { addTodoViewModel(OnBackPressed) },
+                onDoneClicked = { addTodoViewModel(DoneClicked) },
+                onTitleChanged = { addTodoViewModel(OnTitleChanged(it)) },
                 text = viewState.title,
                 isError = viewState.isError
             )
@@ -69,7 +64,7 @@ fun AddItem(
         optionalDialogControls = {
             Calendar(
                 due = viewState.due,
-                onTimeDataPicked = { viewModel(OnTimeDataPicked(it)) }
+                onTimeDataPicked = { addTodoViewModel(OnTimeDataPicked(it)) }
             )
         }
     )
