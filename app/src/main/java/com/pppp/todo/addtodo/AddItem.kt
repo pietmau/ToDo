@@ -6,7 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.R
 import com.pppp.todo.addtodo.Event.Init
 import com.pppp.todo.addtodo.Event.DoneClicked
 import com.pppp.todo.addtodo.Event.OnBackPressed
@@ -60,7 +62,8 @@ fun AddItem(
                 onDoneClicked = { addTodoViewModel(DoneClicked) },
                 onTitleChanged = { addTodoViewModel(OnTitleChanged(it)) },
                 text = viewState.title,
-                isError = viewState.isError
+                isError = viewState.isError,
+                label = stringResource(R.string.new_todo)
             )
         },
         optionalDialogControls = {

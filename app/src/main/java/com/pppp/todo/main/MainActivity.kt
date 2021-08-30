@@ -20,6 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pppp.todo.R
+import com.pppp.todo.addlist.AddList
 import com.pppp.todo.addtodo.AddItem
 import com.pppp.todo.drawer.Drawer
 import com.pppp.todo.edittodo.EditItem
@@ -114,31 +115,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @ExperimentalMaterialApi
-    @ExperimentalComposeUiApi
-    @Composable
-    private fun AddList(
-        isShowing: Boolean = false,
-        onCancel: () -> Unit = {}
-    ) {
-        var text by rememberSaveable { mutableStateOf(EMPTY_STRING) }
-        BottomSheet(
-            isExpanded = isShowing,
-            onDismissed = onCancel,
-            onConfirmClicked = {},
-            onCancelClicked = onCancel,
-            sheetContent = {
-                ClosableInputText(
-                    text = text,
-                    onTitleChanged = { text = it }
-                )
-            },
-            title = stringResource(id = R.string.create_new_list)
-        )
-    }
-
     companion object {
         const val PENDING_INTENT_REQUEST_CODE = 2
-        private const val EMPTY_STRING = ""
     }
 }

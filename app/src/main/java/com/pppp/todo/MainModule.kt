@@ -20,6 +20,7 @@ import com.pppp.todo.notification.WorkManagerNotificationScheduler
 import com.pppp.usecases.ListsRepository
 import com.pppp.usecases.todos.EditTodoUseCase
 import com.pppp.usecases.ToDosRepository
+import com.pppp.usecases.lists.EditListUseCase
 import com.pppp.usecases.lists.GetListsUseCase
 import com.pppp.usecases.main.LastVisitedListRepository
 import com.pppp.usecases.main.LastVisitedUseCase
@@ -87,6 +88,9 @@ abstract class MainModule {
 
         @Provides
         fun provideLastVisitedUseCase(repo: LastVisitedListRepository) = LastVisitedUseCase(repo)
+
+        @Provides
+        fun provideEditListUseCase(): EditListUseCase = EditListUseCase()
     }
 }
 

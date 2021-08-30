@@ -3,5 +3,7 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="add_list">Add list</string>
-    <string name="create_new_list">Create new list</string>
+    <string name="create_new_list">New list</string>
+    <string name="new_todo">New Todo</string>
+    <string name="edit_todo">Edit</string>
 </resources>

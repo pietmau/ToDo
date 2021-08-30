@@ -6,7 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pppp.todo.R
 import com.pppp.todo.edittodo.EditTodoViewEvent.Init
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnBackPressed
 import com.pppp.todo.edittodo.EditTodoViewEvent.OnDateTimePicked
@@ -16,7 +18,6 @@ import com.pppp.todo.exaustive
 import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem
 import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem.None
 import com.pppp.todo.main.MainActivityViewModel.ViewState.EditItem.Some
-import com.pppp.todo.main.viewmodel.MainViewEvent
 import com.pppp.todo.main.viewmodel.MainViewEvent.OnCancel
 import com.pppp.uielements.BottomSheet
 import com.pppp.uielements.Calendar
@@ -67,7 +68,8 @@ fun EditItem(
                 onBackPressed = { editViewModel(OnBackPressed) },
                 onDoneClicked = { editViewModel(OnDoneClicked) },
                 onTitleChanged = { editViewModel(OnTextChanged(it)) },
-                text = state.title
+                text = state.title,
+                label = stringResource(R.string.edit_todo)
             )
         },
         optionalDialogControls = {
