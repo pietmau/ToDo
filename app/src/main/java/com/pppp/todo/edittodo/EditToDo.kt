@@ -69,7 +69,8 @@ fun EditItem(
                 onDoneClicked = { editViewModel(OnDoneClicked) },
                 onTitleChanged = { editViewModel(OnTextChanged(it)) },
                 text = state.title,
-                label = stringResource(R.string.edit_todo)
+                label = stringResource(R.string.edit_todo),
+                isError = state.isError
             )
         },
         optionalDialogControls = {

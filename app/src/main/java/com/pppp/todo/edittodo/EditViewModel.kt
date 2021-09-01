@@ -33,7 +33,7 @@ class EditViewModel @Inject constructor(
         when (event) {
             is Init -> onInit(event.listId, event.itemId)
             is OnBackPressed -> finish()
-            is OnTextChanged -> emitViewState(state.copy(title = event.text))
+            is OnTextChanged -> emitViewState(state.copy(title = event.text, isError = false))
             is OnDoneClicked -> onDoneClicked()
             is OnDateTimePicked -> emitViewState(state.copy(due = event.due))
         }
@@ -58,15 +58,21 @@ class EditViewModel @Inject constructor(
         }
     }
 
-    private fun onDoneClicked() = launch {
-        editTodoUseCase.invoke(
-            EditTodoUseCase.Params.Edit(
-                listId = currentItem?.listId!!,
-                itemId = currentItem?.id!!,
-                values = state.toValueMap()
+    private fun onDoneClicked() {
+        if (state.title.isBlank()) {
+            emitViewState(state.copy(isError = true))
+            return
+        }
+        launch {
+            editTodoUseCase.invoke(
+                EditTodoUseCase.Params.Edit(
+                    listId = currentItem?.listId!!,
+                    itemId = currentItem?.id!!,
+                    values = state.toValueMap()
+                )
             )
-        )
-        emitViewState(EditTodoViewState())
+            emitViewState(EditTodoViewState())
+        }
     }
 
     private fun finish() {
@@ -80,7 +86,8 @@ data class EditTodoViewState(
     val id: String = "",
     val title: String = "",
     val due: Long? = null,
-    val listId: String = ""
+    val listId: String = "",
+    val isError: Boolean = false
 )
 
 sealed class EditTodoViewEvent {

@@ -90,7 +90,8 @@ abstract class MainModule {
         fun provideLastVisitedUseCase(repo: LastVisitedListRepository) = LastVisitedUseCase(repo)
 
         @Provides
-        fun provideEditListUseCase(): EditListUseCase = EditListUseCase()
+        fun provideEditListUseCase(listRepo: ListsRepository, user: User): EditListUseCase =
+            EditListUseCase(listRepo, user)
     }
 }
 

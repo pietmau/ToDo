@@ -8,6 +8,7 @@ import com.pppp.todo.addlist.AddListViewModel.Event.OnVisibilityChanged
 import com.pppp.todo.addlist.AddListViewModel.OneOffEvent
 import com.pppp.todo.addlist.AddListViewModel.ViewState
 import com.pppp.usecases.lists.EditListUseCase
+import com.pppp.usecases.lists.EditListUseCase.Params.Add
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,15 +30,18 @@ class AddListViewModel @Inject constructor(private val editListUseCase: EditList
         }
 
     private fun onSaveClicked() {
-        if (inputIsValid()) {
+        if (state.text.isNotBlank()) {
+            val listTitle = state.text
             emitOneOffEvent(OneOffEvent.OnSaveClicked)
             emitViewState(ViewState())
+            launch {
+                editListUseCase.invoke(Add(listTitle))
+            }
+
         } else {
             onError()
         }
     }
-
-    private fun inputIsValid() = state.text.isNotBlank()
 
     private fun onError() {
         emitViewState(state.copy(isError = true))
