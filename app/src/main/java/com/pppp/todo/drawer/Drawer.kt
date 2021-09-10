@@ -1,11 +1,13 @@
 package com.pppp.todo.drawer
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +20,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -46,13 +49,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun Drawer(
     currentRoute: String = "",
-    closeDrawer: () -> Unit = {},
+    closeDrawer: suspend () -> Unit = {},
     onRouteChanged: (String) -> Unit = {},
     viewModel: DrawerViewModel = viewModel(),
-    addListClicked: suspend () -> Unit = {}
+    addListClicked: suspend () -> Unit = {},
+    isOpen: Boolean = false
 ) {
     val state: State<ViewState> = viewModel.states.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    BackHandler(isOpen) {
+        coroutineScope.launch {
+            closeDrawer()
+        }
+    }
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (spacer, divider, lists, addList) = createRefs()
         Divider(
@@ -89,7 +98,7 @@ fun Drawer(
 private fun Items(
     modifier: Modifier = Modifier,
     items: List<ViewState.ToDoList> = emptyList(),
-    closeDrawer: () -> Unit = {},
+    closeDrawer: suspend () -> Unit = {},
 ) {
     LazyColumn(modifier) {
         items(items) {
@@ -140,7 +149,7 @@ private fun AddListRow(
 private fun DrawerButton(
     label: String,
     isSelected: Boolean,
-    action: () -> Unit,
+    action: suspend () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = MaterialTheme.colors
@@ -170,7 +179,6 @@ private fun DrawerButton(
     ) {
         Row(
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, bottom = 8.dp),
@@ -185,7 +193,9 @@ private fun DrawerButton(
             )
             Text(
                 text = label,
-                modifier = Modifier.alignBy()
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .fillMaxHeight()
             )
         }
     }

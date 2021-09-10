@@ -49,68 +49,76 @@ class MainActivity : ComponentActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setContent {
             ToDoTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    val mainViewModel: MainActivityViewModel = viewModel()
-                    val state by mainViewModel.states.collectAsState()
-                    val scaffoldState = rememberScaffoldState()
-                    Scaffold(
-                        scaffoldState = scaffoldState,
-                        content = {
-                            MainContent(listId = state.listId) { listId, itemId ->
-                                mainViewModel(
-                                    OnEditClicked(
-                                        listId = listId,
-                                        itemId = itemId
-                                    )
-                                )
-                            }
-                        },
-                        drawerContent = {
-                            Drawer(
-                                addListClicked = {
-                                    scaffoldState.toggleDrawer()
-                                    mainViewModel(OnNewListClicked)
-                                }
-                            )
-                        },
-                        topBar = {
-                            AppBar {
-                                //mainViewModel(OnDrawerOpened)
-                                scaffoldState.toggleDrawer()
-                            }
-                        },
-                        floatingActionButton = {
-                            Fab(onClick = {
-                                mainViewModel.invoke(MainActivityViewModel.Event.OnNewItemClicked)
-                            })
-                        },
-                        isFloatingActionButtonDocked = true,
-                        bottomBar = {
-                            BottomAppBar {}
-                        },
-                    )
-                    AddList(
-                        state.addNewListIsShowing,
-                        onCancel = { mainViewModel(OnNewListDismissed) })
-                    AddItem(
-                        listId = state.listId,
-                        isVisible = state.addNewItemIsShowing,
-                        onToDoAdded = { listId, title, due ->
-                            mainViewModel(
-                                OnToDoAdded(
-                                    listId = listId,
-                                    title = title,
-                                    due = due
-                                )
-                            )
+                Home()
+            }
+        }
+    }
 
-                        },
-                        onBackPressed = { mainViewModel.invoke(OnNewItemDismissed) }
-                    )
-                    EditItem(state.itemBeingEdited) {
-                        mainViewModel.invoke(OnEditDismissed)
+    @ExperimentalComposeUiApi
+    @ExperimentalMaterialApi
+    @Composable
+    private fun Home() {
+        Surface(color = MaterialTheme.colors.background) {
+            val mainViewModel: MainActivityViewModel = viewModel()
+            val state by mainViewModel.states.collectAsState()
+            val scaffoldState = rememberScaffoldState()
+            Scaffold(
+                scaffoldState = scaffoldState,
+                content = {
+                    MainContent(listId = state.listId) { listId, itemId ->
+                        mainViewModel(
+                            OnEditClicked(
+                                listId = listId,
+                                itemId = itemId
+                            )
+                        )
                     }
-                }
+                },
+                drawerContent = {
+                    Drawer(
+                        addListClicked = {
+                            scaffoldState.toggleDrawer()
+                            mainViewModel(OnNewListClicked)
+                        },
+                        isOpen = scaffoldState.drawerState.isOpen,
+                        closeDrawer = { scaffoldState.toggleDrawer() }
+                    )
+                },
+                topBar = {
+                    AppBar {
+                        scaffoldState.toggleDrawer()
+                    }
+                },
+                floatingActionButton = {
+                    Fab(onClick = {
+                        mainViewModel.invoke(MainActivityViewModel.Event.OnNewItemClicked)
+                    })
+                },
+                isFloatingActionButtonDocked = true,
+                bottomBar = {
+                    BottomAppBar {}
+                },
+            )
+            AddList(
+                state.addNewListIsShowing,
+                onCancel = { mainViewModel(OnNewListDismissed) })
+            AddItem(
+                listId = state.listId,
+                isVisible = state.addNewItemIsShowing,
+                onToDoAdded = { listId, title, due ->
+                    mainViewModel(
+                        OnToDoAdded(
+                            listId = listId,
+                            title = title,
+                            due = due
+                        )
+                    )
+
+                },
+                onBackPressed = { mainViewModel.invoke(OnNewItemDismissed) }
+            )
+            EditItem(state.itemBeingEdited) {
+                mainViewModel.invoke(OnEditDismissed)
             }
         }
     }
